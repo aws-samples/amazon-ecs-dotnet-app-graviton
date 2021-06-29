@@ -1,11 +1,8 @@
-## My Project
+## Deploy a .NET Application on Amazon ECS powered by Graviton2
 
 TODO: Fill this README out!
 
-Be sure to:
-
-* Change the title in this README
-* Edit your repository description on GitHub
+This repo contains a sample application which is used in the Deploy a .NET Application on Amazon ECS powered by Graviton2 getting started here - https://aws.amazon.com/getting-started/hands-on/deploy-dotnet-app-ecs-gaviton
 
 ## Security
 
