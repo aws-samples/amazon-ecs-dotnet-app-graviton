@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using MvcMovie.Models;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using MvcMovie.Data;
 
 namespace MvcMovie.Controllers
 {
@@ -86,14 +87,57 @@ namespace MvcMovie.Controllers
                 return View(changePassword);
             }
             
+            if(user.EnforceChangePassword)
+            {
+                user.EnforceChangePassword = false;
+                await _userManager.UpdateAsync(user);
+            }
+            
             _logger.LogInformation($"User {user.UserName} password changed.");
-
+          
             return RedirectToAction("ChangePasswordConfirmation");
         }
 
         public IActionResult ChangePasswordConfirmation()
         {
             return View();
+        }
+        
+        public IActionResult SetPassword()
+        {
+            var model = new SetPassword();
+            return View(model);
+        }
+        
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SetPassword(SetPassword setPassword)
+        {
+            if (!ModelState.IsValid)
+                return View(setPassword);
+                
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            if (user == null)
+                return NotFound();
+
+            var changePassResult = await _userManager.ChangePasswordAsync(user, DbHelper.DefaultPassword, setPassword.NewPassword);
+
+            if (!changePassResult.Succeeded)
+            {
+                foreach (var error in changePassResult.Errors)
+                    ModelState.AddModelError(error.Code, error.Description);
+                return View(setPassword);
+            }
+            
+            if(user.EnforceChangePassword)
+            {
+                user.EnforceChangePassword = false;
+                await _userManager.UpdateAsync(user);
+            }
+            
+            _logger.LogInformation($"User {user.UserName} password changed.");
+          
+            return RedirectToAction("ChangePasswordConfirmation");
         }
     }
 }

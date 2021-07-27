@@ -9,6 +9,9 @@ namespace MvcMovie.Data
 {
     public static class DbHelper
     {
+        private const string DefaultUsername = "admin";
+        internal const string DefaultPassword = "Pass@word1";
+        
         public static void Initialize(IServiceProvider serviceProvider)
         {
             UpdateDatabase(serviceProvider);
@@ -18,52 +21,48 @@ namespace MvcMovie.Data
 
         private static void UpdateDatabase(IServiceProvider serviceProvider)
         {
-             using (var context = new MvcMovieContext(
+            using var context = new MvcMovieContext(
                 serviceProvider.GetRequiredService<
-                    DbContextOptions<MvcMovieContext>>()))
-            {
-                context.Database.Migrate();
-            }
+                    DbContextOptions<MvcMovieContext>>());
+            context.Database.Migrate();
         }
 
         private static void RegisterUsers(IServiceProvider serviceProvider)
         {
-            using (var context = new MvcMovieContext(
+            using var context = new MvcMovieContext(
                 serviceProvider.GetRequiredService<
-                    DbContextOptions<MvcMovieContext>>()))
+                    DbContextOptions<MvcMovieContext>>());
+            
+            // Look for any movies.
+            if (context.Users.Any())
             {
-                // Look for any movies.
-                if (context.Users.Any())
-                {
-                    return;   // DB has been seeded
-                }
-
-                var userManager = serviceProvider.GetRequiredService<UserManager<AppUser>>();
-
-                var appUser = new AppUser
-                {
-                    UserName = "admin"
-                };
-
-                userManager.CreateAsync(appUser, "Pass@word1").GetAwaiter().GetResult();
+                return;   // DB has been seeded
             }
+
+            var userManager = serviceProvider.GetRequiredService<UserManager<AppUser>>();
+
+            var appUser = new AppUser
+            {
+                UserName = DefaultUsername,
+                EnforceChangePassword = true
+            };
+
+            userManager.CreateAsync(appUser, DefaultPassword).GetAwaiter().GetResult();
         }
 
         private static void InitializeMovies(IServiceProvider serviceProvider)
         {
-            using (var context = new MvcMovieContext(
+            using var context = new MvcMovieContext(
                 serviceProvider.GetRequiredService<
-                    DbContextOptions<MvcMovieContext>>()))
+                    DbContextOptions<MvcMovieContext>>());
+            // Look for any movies.
+            if (context.Movie.Any())
             {
-                // Look for any movies.
-                if (context.Movie.Any())
-                {
-                    return;   // DB has been seeded
-                }
-
-                context.Movie.AddRange(GetMovies());
-                context.SaveChanges();
+                return;   // DB has been seeded
             }
+
+            context.Movie.AddRange(GetMovies());
+            context.SaveChanges();
         }
         
         private static Movie[] GetMovies()

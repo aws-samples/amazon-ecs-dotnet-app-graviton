@@ -14,5 +14,6 @@ namespace MvcMovie.Models
         public string AuthenticationType { get; set; }
         public bool IsAuthenticated { get; set; }
         public string Name { get; set; }
+        public bool EnforceChangePassword { get; set; }
     }
 }

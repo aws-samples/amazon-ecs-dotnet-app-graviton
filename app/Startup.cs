@@ -7,7 +7,6 @@ using MvcMovie.Data;
 using MvcMovie.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
-using MySql.EntityFrameworkCore;
 
 namespace MvcMovie
 {

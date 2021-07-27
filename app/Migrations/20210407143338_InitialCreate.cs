@@ -48,7 +48,8 @@ namespace MvcMovie.Migrations
                     NormalizedUserName = table.Column<string>(type: "text", nullable: true),
                     AuthenticationType = table.Column<string>(type: "text", nullable: true),
                     IsAuthenticated = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: true)
+                    Name = table.Column<string>(type: "text", nullable: true),
+                    EnforceChangePassword = table.Column<bool>(type: "tinyint(1)", nullable: false),
                 },
                 constraints: table =>
                 {
