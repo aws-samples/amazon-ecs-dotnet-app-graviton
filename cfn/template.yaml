@@ -2,29 +2,29 @@ AWSTemplateFormatVersion: 2010-09-09
 Transform: AWS::Serverless-2016-10-31
 Description: Containerize .Net on Graviton 2 Environment
 
-Metadata: 
-  AWS::CloudFormation::Interface: 
-    ParameterGroups: 
-      - 
-        Label: 
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      -
+        Label:
           default: "Network Configuration"
-        Parameters: 
+        Parameters:
           - TargetVPCName
-      - 
-        Label: 
+      -
+        Label:
           default: "Amazon RDS Configuration"
-        Parameters: 
+        Parameters:
           - DBInstanceID
           - DBName
           - DBUsername
-    ParameterLabels: 
-      TargetVPCName: 
+    ParameterLabels:
+      TargetVPCName:
         default: "Target VPC name"
-      DBInstanceID: 
+      DBInstanceID:
         default: "Instance identifier"
-      DBName: 
+      DBName:
         default: "Database name"
-      DBUsername: 
+      DBUsername:
         default: "Master username"
 
 Parameters:
@@ -88,7 +88,7 @@ Mappings:
       AZs: [a, b]
     eu-west-1:      # Europe (Ireland)
       AZs: [a, b]
-      
+
 Resources:
   TargetVPC:
     Type: AWS::EC2::VPC
@@ -124,7 +124,7 @@ Resources:
         - SubnetConfig
         - Public0
         - CIDR
-      MapPublicIpOnLaunch: true
+      MapPublicIpOnLaunch: false
       Tags:
       - Key: Network
         Value: Public
@@ -160,7 +160,7 @@ Resources:
         - SubnetConfig
         - Public1
         - CIDR
-      MapPublicIpOnLaunch: true
+      MapPublicIpOnLaunch: false
       Tags:
       - Key: Network
         Value: Public
@@ -394,7 +394,7 @@ Resources:
       NetworkAclId:
         Ref: PublicNetworkAcl
       RuleNumber: 100
-      Protocol: -1
+      Protocol: 6
       RuleAction: allow
       Egress: false
       CidrBlock: '0.0.0.0/0'
@@ -407,7 +407,7 @@ Resources:
       NetworkAclId:
         Ref: PublicNetworkAcl
       RuleNumber: 100
-      Protocol: -1
+      Protocol: 6
       RuleAction: allow
       Egress: true
       CidrBlock: '0.0.0.0/0'
@@ -555,8 +555,7 @@ Resources:
     DependsOn:
     - PublicSubnet0
     - PublicSubnet1
-    Properties: 
-      GroupName: ALBSG
+    Properties:
       GroupDescription: ALB SG
       VpcId:
         Ref: TargetVPC
@@ -587,7 +586,9 @@ Resources:
     Type: AWS::EC2::SecurityGroupEgress
     Properties:
       Description: Egress HTTP from load balancer
-      IpProtocol: '-1'
+      IpProtocol: tcp
+      ToPort: 65535
+      FromPort: 0
       CidrIp: '0.0.0.0/0'
       GroupId:
         Ref: ALBSG
@@ -597,7 +598,6 @@ Resources:
     - PrivateSubnet00
     - PrivateSubnet10
     Properties:
-      GroupName: ECSServiceSG
       GroupDescription: DB Server SG
       VpcId:
         Ref: TargetVPC
@@ -619,7 +619,9 @@ Resources:
     Type: AWS::EC2::SecurityGroupEgress
     Properties:
       Description: Egress HTTP from ECS load balancer
-      IpProtocol: '-1'
+      IpProtocol: tcp
+      ToPort: 65535
+      FromPort: 0
       CidrIp: '0.0.0.0/0'
       GroupId:
         Ref: ECSServiceSG
@@ -629,7 +631,6 @@ Resources:
     - PrivateSubnet01
     - PrivateSubnet11
     Properties:
-      GroupName: DBServerSG
       GroupDescription: DB Server SG
       VpcId:
         Ref: TargetVPC
@@ -670,12 +671,12 @@ Resources:
     Type: "AWS::RDS::DBCluster"
     DeletionPolicy: Delete
     Properties:
-      DBClusterParameterGroupName: 
+      DBClusterParameterGroupName:
         Ref: RDSDBClusterParameterGroup
-      DBSubnetGroupName: 
+      DBSubnetGroupName:
         Ref: DBSubnetGroup
       Engine: aurora
-      DatabaseName: 
+      DatabaseName:
         Ref: DBName
       MasterUsername: !Join ['', ['{{resolve:secretsmanager:', !Ref RDSSecret, ':SecretString:username}}' ]]
       MasterUserPassword: !Join ['', ['{{resolve:secretsmanager:', !Ref RDSSecret, ':SecretString:password}}' ]]
@@ -703,14 +704,14 @@ Resources:
       TargetType: AWS::RDS::DBCluster
   RDSDBClusterParameterGroup:
     Type: "AWS::RDS::DBClusterParameterGroup"
-    Properties: 
+    Properties:
       Description: "CloudFormation Sample Aurora Cluster Parameter Group"
       Family: aurora5.6
-      Parameters: 
+      Parameters:
         character_set_database: utf32
   RDSDBInstance:
     Type: "AWS::RDS::DBInstance"
-    Properties: 
+    Properties:
       AvailabilityZone:
         Fn::Sub:
         - ${AWS::Region}${AZ}
@@ -721,12 +722,12 @@ Resources:
               - RegionMap
               - Ref: AWS::Region
               - AZs
-      DBClusterIdentifier: 
+      DBClusterIdentifier:
         Ref: RDSCluster
       DBInstanceClass: db.t3.small
-      DBParameterGroupName: 
+      DBParameterGroupName:
         Ref: RDSDBParameterGroup
-      DBSubnetGroupName: 
+      DBSubnetGroupName:
         Ref: DBSubnetGroup
       DBInstanceIdentifier: 
         Ref: DBInstanceID
@@ -765,6 +766,7 @@ Resources:
       Role: !GetAtt LambdaVolumeResizeRole.Arn
       Runtime: python3.8
       Handler: index.handler
+      ReservedConcurrentExecutions: 5
       Environment:
         Variables:
           instance_name: !GetAtt Cloud9Instance.Name
@@ -775,14 +777,11 @@ Resources:
           import boto3
           import botocore.exceptions
           import os
-
           ec2 = boto3.client('ec2')
-
           def handler(event, context):
             responseData = {}
             instance_name = '*' + os.environ['instance_name'] + '*'
             print('Modifying Volume size for ' + instance_name)
-
             try:
               instance_data = ec2.describe_instances(Filters=[{'Name': 'tag:Name', 'Values': [instance_name]}])
               print(instance_data)
@@ -795,7 +794,6 @@ Resources:
               responseData['Data'] = 'FAILED'
               cfnresponse.send(event, context, cfnresponse.FAILED, responseData, 'CustomResourcePhysicalID')
               return
-
             try:
               volume_id = instance_data['Reservations'][0]['Instances'][0]['BlockDeviceMappings'][0]['Ebs']['VolumeId']
               responseData['Data'] = volume_id
@@ -806,9 +804,7 @@ Resources:
               responseData['Data'] = 'Failed'
               cfnresponse.send(event, context, cfnresponse.FAILED, responseData, 'CustomResourcePhysicalID')
               return
-
             print('Volume modified for instance ' + instance_name)
-
             try:
               cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData, 'CustomResourcePhysicalID')
             except:
@@ -834,7 +830,7 @@ Resources:
                   - logs:CreateLogGroup
                   - logs:CreateLogStream
                   - logs:PutLogEvents
-                Resource: '*'
+                Resource: 'arn:aws:logs:*'
         - PolicyName: GetEc2Info
           PolicyDocument:
             Version: 2012-10-17
@@ -842,39 +838,35 @@ Resources:
               - Effect: Allow
                 Action:
                   - ec2:DescribeInstances
-                  - ec2:ModifyVolume
                 Resource: '*'
+        - PolicyName: GetEc2ModifyVolume
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ec2:ModifyVolume
+                Resource: 'arn:aws:ec2:*:*:volume/*'
   CustomECSTaskExecutionRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
         Version: 2012-10-17
-        Statement: 
+        Statement:
           - Effect: Allow
-            Principal: 
-              Service: 
+            Principal:
+              Service:
                 - ecs-tasks.amazonaws.com
-            Action: 
+            Action:
               - sts:AssumeRole
       Path: /
+      ManagedPolicyArns:
+            - "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
       Policies:
-        - PolicyName: ecs-task-execution
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement: 
-              - Effect: Allow
-                Action:
-                  - ecr:GetAuthorizationToken
-                  - ecr:BatchCheckLayerAvailability
-                  - ecr:GetDownloadUrlForLayer
-                  - ecr:BatchGetImage
-                  - logs:CreateLogStream
-                  - logs:PutLogEvents
-                Resource: "*"
         - PolicyName: get-secret-value
           PolicyDocument:
             Version: 2012-10-17
-            Statement: 
+            Statement:
               - Effect: Allow
                 Action:
                   - secretsmanager:GetSecretValue
