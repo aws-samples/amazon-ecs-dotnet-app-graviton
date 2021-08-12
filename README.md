@@ -41,6 +41,22 @@ For the guide, please follow [here](https://aws.amazon.com/getting-started/hands
   - [Create ECS Task Definition](#create-ecs-task-definition)
 - [Module 5: Deploy the Application to Amazon ECS](#module-5-deploy-the-application-to-amazon-ecs)
   - [Create ECS Service](#create-ecs-service)
+  - [Setup Load Balancing](#setup-load-balancing)
+  - [Define Network Boundaries](#define-network-boundaries)
+  - [Enable Session Management for Smple Application](#enable-session-management-for-smple-application)
+  - [Test the deployment](#test-the-deployment)
+- [Module 6: Monitoring and Logging](#module-6-monitoring-and-logging)
+  - [Confirm Container Insights is Enabled](#confirm-container-insights-is-enabled)
+  - [Visualising Container Insights in CloudWatch](#visualising-container-insights-in-cloudwatch)
+  - [Analysing Application Logs via CloudWatch](#analysing-application-logs-via-cloudwatch)
+- [Module 7: Clean Up](#module-7-clean-up)
+  - [Delete ECS Service](#delete-ecs-service)
+  - [Delete Load Balancer](#delete-load-balancer)
+  - [Delete Target Group](#delete-target-group)
+  - [Delete Task Definition](#delete-task-definition)
+  - [Delete ECS Cluster](#delete-ecs-cluster)
+  - [Delete ECR Repository](#delete-ecr-repository)
+  - [Delete CloudFormation Stack](#delete-cloudformation-stack)
 - [Security](#security)
 - [License](#license)
 
@@ -382,7 +398,244 @@ So far in the guide we have prepared the foundational environment for our sample
 
 1. Select the Cluster - **Graviton2ECSCluster**
 
+![Cluster - Deploy Service](docs/Step5-1.png)
 
+2. Under the Services Tab, click Deploy button
+
+3. Under the Environment Section, expand Compute Configuration (advanced) section
+
+4. Select the Cluster we created (should already be selected) i.e. Graviton2ECS
+
+5. Select Launch Type as EC2 from the dropdown
+
+![Service Launch Type](docs/Step5-2.png)
+
+6. Under Deployment configuration section select Service, and under Task definition - Family select the task we created - **Graviton2ECSTask**, and **Revision** as **LATEST**
+
+7. Enter **name** as **Graviton2ECSService**
+
+8. Enter value for **Desired Tasks** to be **2**, as shown in the screenshot below
+
+![Desired Tasks](docs/Step5-3.png)
+
+Stay on the same screen, we’ll setup Load Balancing for the Service.
+
+### Setup Load Balancing
+
+1. Expand Load balancing - optional section, select Create a new load balancer and enter name as **Graviton2ECSALB**
+
+2. Ensure Listener Port is 80 and Protocol HTTP
+
+3. Enter Target group name as **Graviton2ECS-ALB-TG** and protocol as HTTP
+
+![ALB Configuration](docs/Step5-4.png)
+
+### Define Network Boundaries
+
+1. In the Networking section select **TargetVPC** under the VPC dropdown.
+
+2. Select Public subnets - **TargetVPC-public-a** and **TargetVPC-public-b**, this is only required for ALB Configuration.
+
+3. Under Security group select - **Use an existing security group** and choose **ALBSG** from the dropdown.
+
+![Networking](docs/Step5-5.png)
+
+4. Leave rest of the settings to default.
+
+5. Click **Deploy** button. Service deployment can take a few minutes. Once finished the Cluster will look like.
+
+![Cluster with Service](docs/Step5-6.png)
+
+6. Click on Service **Graviton2ECSService** from the list of Services to view the Tasks running, Health check status and notifications:
+
+![Service](docs/Step5-7.png)
+
+You can note the Desired and Running count to verify that that ECS Service has successfully instantiated desired number of tasks. At this stage our Sample Application is live, under a single Task, behind an Application Load Balancer.
+
+### Enable Session Management for Smple Application
+
+Sample .Net web application has Login Functionality, which enables logged in user to edit the records, stored in Aurora DB. 
+
+For the session management, this guide takes the simplest route by enabling sticky session, instead of adding adding complexity in the .Net sample app.
+
+Sticky sessions are a mechanism to route requests from the same client to the same target. Elastic Load Balancers support sticky sessions. Stickiness is defined at a target group level.
+
+So the next step is to modify the Load balancing target group created by the ECS Service - **Graviton2ECS-ALB-TG**, and enable Session stickiness.
+
+1. Go to EC2 from the Services drop down in the top navigation or search for EC2, click on Target Groups from Load Balancing category in the left hand side navigation pane.
+
+2. Choose the name of **Graviton2ECS-ALB-TG** target group to open its details page.
+
+3. On the Group details tab, in the Attributes section, choose Edit.
+
+![Enable Sticky Session](docs/Step5-8.jpg)
+On the Edit attributes page, 
+
+4. Select Stickiness.
+
+5. For Stickiness type, select Load balancer generated cookie.
+
+6. For Stickiness duration, leave the default value of 1 day.
+
+7. Choose Save changes.
+
+![Enable Sticky Session 2](docs/Step5-9.jpg)
+
+### Test the deployment
+
+Now the application is ready for testing, and we need to find the public facing URL of the application, which is the DNS Name of the Application Load Balancer created by ECS Service.
+
+1. Staying on EC2 Service console, click on Load Balancers in the left side Navigation pane, and select **Graviton2ECSALB**.
+
+2. Copy the value of DNS Name as shown below:
+
+![ALB URL Page](docs/Step5-10.png)
+
+3. Open the copied URL in a new Browser window, It should open the Sample Application - Academy Award website.
+
+![Website](docs/Step5-11.png)
+
+Application is in read-only for anonymous users, to be able to modify the data, you can login to the application using following admin credentials:
+
+```
+Username: admin
+Password: Pass@word1
+```
+
+When you logged in for the first time, application asks you to set a new password for your user, choose a new password and continue.
+
+![Mandatory Change Password](docs/Step5-12.png)
+
+This step completes the deployment of Sample .NET Web Application on Amazon ECS.
+
+## Module 6: Monitoring and Logging
+
+This final module will focus on how you enable monitoring for your ECS environment using Amazon CloudWatch [Container Insights](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/ContainerInsights.html). 
+
+This can be used to collect, aggregate, and summarise metrics and logs from your containerised application. 
+
+Container Insights also provides diagnostic information, such as container restart failures, to help you isolate issues and resolve them quickly. You can also set CloudWatch alarms on metrics that Container Insights collects.
+
+### Confirm Container Insights is Enabled
+
+1. If for any reason, we missed to enable Container Insights in Module 4, we can enable it via AWS CLI on existing Amazon ECS clusters run the command below: 
+
+```
+aws ecs update-cluster-settings --cluster Graviton2ECSCluster --settings name=containerInsights,value=enabled --region ${AWS_REGION}
+```
+
+2. From the response of the command confirm that the settings the name “containerInsights” has the value “enabled”
+
+![Container Insights](docs/Step6-1.png)
+
+### Visualising Container Insights in CloudWatch
+
+1. Navigate to the [Amazon CloudWatch Console](https://console.aws.amazon.com/cloudwatch) by typing “CloudWatch” and selecting the service name from the drop down
+2. The CloudWatch console is displayed as show below, ensure the **New menu experience** is selected on the top left corner of the screen to use the new CloudWatch console. On the menu on the left, click on **Container Insights** under the **Insights** section.
+
+![Container Insights - 1](docs/Step6-3.png)
+
+3. The Container Insights dashboard is show below, ensure the **List View** is selected at the top right corner to show the list of the container resources. You can see the **Graviton2ECSCluster**, **Graviton2ECSService** and **Graviton2ECSTask**, which are resources created so far.
+
+![Container Insights - 2](docs/Step6-4.png)
+
+4. Container Insights provides metrics for each of these resources to help provide visibility on what is going on within the resources. Click on each of the resource to see the metrics as show below
+
+    **Cluster metrics** - this provides a view of the CPU Utilisation, Memory Utilisation and Network Transferred and Received. It also provides a view of the count of Container Instance, Task and Service within the cluster.
+
+![Cluster Metrics](docs/Step6-5.png)
+
+
+    **Service metrics** - provides a view of the aggregated metrics of the tasks running within the service and also the performance for each of the tasks.
+
+    **Task metrics** - provides a view of the metrics for each task running in the cluster.
+
+![Cluster Metrics 2](docs/Step6-6.png)
+
+### Analysing Application Logs via CloudWatch
+
+While creating the Task Definition as shown in Module 4, you enabled Log Configuration and specified a name for the log group. This will enable the application logs that were previously sent out to standard output to be sent to Amazon CloudWatch Logs. In this step, we will show how to review the application logs sent to CloudWatch.
+
+1. Navigate to the CloudWatch Console and click on Log Group under Logs in the left menu
+
+![CloudWatch Logs 1](docs/Step6-7.png)
+
+2. The Log Group that was configured in Module 4 while creating the task definition is **/ecs/Graviton2ECSTask**. Select this log group to show the log streams from the containers in the ECS task. Sending logs to Cloudwatch logs enables you to view different logs from your containers in one convenient location, and it prevents your container logs from taking up disk space on your container instances. 
+
+![CloudWatch Logs 2](docs/Step6-8.png)
+
+3. Select a log stream to display the application logs. On the top right corner of the screen you can specify filters based on date and time to retrieve the logs.
+
+![CloudWatch Logs 3](docs/Step6-9.png)
+
+
+## Module 7: Clean Up
+
+In the steps below, we’ll run through the steps to clean up the resources we created in this lab.
+
+### Delete ECS Service
+
+1. In a new browser window, open the [Amazon ECS Console](https://console.aws.amazon.com/ecs/)
+2. In the navigation pane, click on **Clusters**
+3. Click on the cluster **Graviton2ECSCluster**
+4. Select the **Graviton2ECSService** service and click on **Delete**
+5. Check the option **Force delete service**
+6. Confirm your action.
+
+### Delete Load Balancer
+
+1. In a new browser window, open the [Amazon ECS Console](https://console.aws.amazon.com/ecs/)
+2. In the left navigation pane, click on **Load balancers**
+3. If not already selected, select **Graviton2ECSALB**, from the list of Load balancers
+4. Click the dropdown **Actions** button at the top of the page
+5. Select **Delete** under the dropdown menu
+6. Confirm your action.
+
+### Delete Target Group
+
+1. In a new browser window, open the [Amazon ECS Console](https://console.aws.amazon.com/ecs/)
+2. In the left navigation pane, click on **Target groups**
+3. If not already selected, select **Graviton2ECS-ALB-TG**, from the list of Target Groups
+4. Click the dropdown **Actions** button at the top of the page
+5. Select **Delete** under the dropdown menu
+6. Confirm your action.
+
+### Delete Task Definition
+
+1. In a new browser window, open the [Amazon ECS Console](https://console.aws.amazon.com/ecs/)
+2. In the left navigation pane, click on **Task definitions**
+3. Click on the Task Definition - **Graviton2ECSTask** to open
+4. Select the revision
+5. Click the white dropdown **Actions** button at the top of the page
+6. Click on **Deregister**
+7. Confirm your action
+8. Repeat these steps for any other revisions present for the task definition
+
+### Delete ECS Cluster
+
+1. In a new browser window, open the [Amazon ECS Console](https://console.aws.amazon.com/ecs/)
+2. In the left navigation pane, click on **Clusters**
+3. **Interim step** - In the navigation pane, **turn off New ECS Experience**, to use the old console. This is required in the interim until the delete cluster workflow is introduced in the new Amazon ECS console, as mentioned in the Deleting a cluster documentation 
+4. Click on the cluster **Graviton2ECSCluster** to open
+5. Click on **Delete cluster** button at the top of the page
+6. Confirm your action
+7. This action will delete the ECS tasks and services, so it may take a few minutes.
+
+### Delete ECR Repository
+
+1. In a new browser window, open the [Amazon ECS Console](https://console.aws.amazon.com/ecs/)
+2. In the left navigation pane, click on **Repositories**, under Amazon ECR
+3. Select the repository name **movie-app-repo**
+4. Click on **Delete** button at the top of the page
+5. Confirm your action
+
+### Delete CloudFormation Stack
+
+1. In a new browser window, open the [AWS CloudFormation Console](https://console.aws.amazon.com/cloudformation/)
+2. In the left navigation pane, expand the sidebar and click on **Stacks**
+3. Select the stack name **ContainerizeDotNetOnECSGraviton2**
+4. Click on **Delete** button at the top of the page
+5. Confirm your action
 
 ## Security
 
