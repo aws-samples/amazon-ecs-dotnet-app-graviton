@@ -1,0 +1,85 @@
+@model MvcMovie.Models.MovieGenreViewModel
+
+@using Microsoft.AspNetCore.Identity
+@using MvcMovie.Models
+
+@inject SignInManager<AppUser> SignInManager
+@inject UserManager<AppUser> UserManager
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>2010s Best Picture Winners</h2>
+<hr />
+
+@if (SignInManager.IsSignedIn(User))
+{
+    <p>
+        <a asp-action="Create">Create New</a>
+    </p>
+}
+
+<form asp-controller="Home" asp-action="Index" method="GET">
+    <p>
+        Year: <select asp-for="WinYear" asp-items="Model.Years">
+            <option value="">All</option>
+        </select>
+
+        Genre: <select asp-for="MovieGenre" asp-items="Model.Genres">
+            <option value="">All</option>
+        </select>
+
+        Title: <input type="text" name="SearchString" />
+        <input type="submit" value="Filter" />
+    </p>
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Movies[0].Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Movies[0].Year)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Movies[0].Genre)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Movies[0].Director)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Movies) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Title)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Year)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Genre)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Director)
+            </td>
+            <td>
+                @if (SignInManager.IsSignedIn(User))
+                {
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> @Html.Raw("|")
+                }
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a>
+                @if (SignInManager.IsSignedIn(User))
+                {
+                    @Html.Raw("|") <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                }
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
