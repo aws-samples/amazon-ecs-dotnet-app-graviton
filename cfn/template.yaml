@@ -691,6 +691,7 @@ Resources:
           - ${AWS::StackName}-${SecretName}
           - { SecretName: RDSSecret }
       Description: "This is a Secrets Manager secret for an RDS DB instance"
+      KmsKeyId: alias/aws/secretsmanager
       GenerateSecretString:
         SecretStringTemplate: !Join ['', ['{"username": "', !Ref DBUsername, '"}' ]]
         GenerateStringKey: "password"
@@ -729,8 +730,6 @@ Resources:
         Ref: RDSDBParameterGroup
       DBSubnetGroupName:
         Ref: DBSubnetGroup
-      DBInstanceIdentifier: 
-        Ref: DBInstanceID
       Engine: aurora
       PubliclyAccessible: false
       MultiAZ: false
@@ -831,7 +830,9 @@ Resources:
                   - logs:CreateLogGroup
                   - logs:CreateLogStream
                   - logs:PutLogEvents
-                Resource: 'arn:aws:logs:*'
+                Resource:
+                  - !Sub arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:*
+                  - !Sub arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:log-stream:*
         - PolicyName: GetEc2Info
           PolicyDocument:
             Version: 2012-10-17
