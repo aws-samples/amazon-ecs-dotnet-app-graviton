@@ -780,31 +780,32 @@ Resources:
           ec2 = boto3.client('ec2')
           def handler(event, context):
             responseData = {}
-            instance_name = '*' + os.environ['instance_name'] + '*'
-            print('Modifying Volume size for ' + instance_name)
-            try:
-              instance_data = ec2.describe_instances(Filters=[{'Name': 'tag:Name', 'Values': [instance_name]}])
-              print(instance_data)
-            except botocore.exceptions.ClientError as err:
-              print(err)
-              responseData['Data'] = 'FAILED'
-              cfnresponse.send(event, context, cfnresponse.FAILED, responseData, 'CustomResourcePhysicalID')
-              return
-            except:
-              responseData['Data'] = 'FAILED'
-              cfnresponse.send(event, context, cfnresponse.FAILED, responseData, 'CustomResourcePhysicalID')
-              return
-            try:
-              volume_id = instance_data['Reservations'][0]['Instances'][0]['BlockDeviceMappings'][0]['Ebs']['VolumeId']
-              responseData['Data'] = volume_id
-              volume_response = ec2.modify_volume(VolumeId=volume_id, Size=20)
-              print(volume_response)
-            except Exception as err:
-              print(err)
-              responseData['Data'] = 'Failed'
-              cfnresponse.send(event, context, cfnresponse.FAILED, responseData, 'CustomResourcePhysicalID')
-              return
-            print('Volume modified for instance ' + instance_name)
+            if event['RequestType'] != 'Delete':
+              instance_name = '*' + os.environ['instance_name'] + '*'
+              print('Modifying Volume size for ' + instance_name)
+              try:
+                instance_data = ec2.describe_instances(Filters=[{'Name': 'tag:Name', 'Values': [instance_name]}])
+                print(instance_data)
+              except botocore.exceptions.ClientError as err:
+                print(err)
+                responseData['Data'] = 'FAILED'
+                cfnresponse.send(event, context, cfnresponse.FAILED, responseData, 'CustomResourcePhysicalID')
+                return
+              except:
+                responseData['Data'] = 'FAILED'
+                cfnresponse.send(event, context, cfnresponse.FAILED, responseData, 'CustomResourcePhysicalID')
+                return
+              try:
+                volume_id = instance_data['Reservations'][0]['Instances'][0]['BlockDeviceMappings'][0]['Ebs']['VolumeId']
+                responseData['Data'] = volume_id
+                volume_response = ec2.modify_volume(VolumeId=volume_id, Size=20)
+                print(volume_response)
+              except Exception as err:
+                print(err)
+                responseData['Data'] = 'Failed'
+                cfnresponse.send(event, context, cfnresponse.FAILED, responseData, 'CustomResourcePhysicalID')
+                return
+              print('Volume modified for instance ' + instance_name)
             try:
               cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData, 'CustomResourcePhysicalID')
             except:
