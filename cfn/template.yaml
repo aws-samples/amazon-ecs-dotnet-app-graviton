@@ -849,7 +849,7 @@ Resources:
                 Action:
                   - ec2:ModifyVolume
                 Resource: 'arn:aws:ec2:*:*:volume/*'
-  CustomECSTaskExecutionRole:
+  ECSTaskExecutionRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -874,10 +874,6 @@ Resources:
                   - secretsmanager:GetSecretValue
                 Resource:
                   - !Ref RDSSecret
-      RoleName:
-        !Sub
-          - ${AWS::StackName}-${RoleName}-${AWS::Region}
-          - { RoleName: ECSTaskExecutionRole }
 
 Outputs:
   Cloud9IDE:
