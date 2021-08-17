@@ -86,7 +86,13 @@ Mappings:
       AZs: [a, b]
     ap-southeast-1: # Asia Pacific (Singapore)
       AZs: [a, b]
+    ap-southeast-2: # Asia Pacific (Sydney)
+      AZs: [a, b]
     eu-west-1:      # Europe (Ireland)
+      AZs: [a, b]
+    eu-west-2:      # Europe (London)
+      AZs: [a, b]
+    eu-central-1:   # Europe (Frankfurt)
       AZs: [a, b]
 
 Resources:
