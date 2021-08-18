@@ -1,3 +1,6 @@
+[![Publish Version](https://github.com/aws-samples/amazon-ecs-dotnet-app-graviton/workflows/Publish%20Version/badge.svg)](https://github.com/aws-samples/amazon-ecs-dotnet-app-graviton/actions)
+[![Unit Tests](https://github.com/aws-samples/amazon-ecs-dotnet-app-graviton/workflows/Unit%20Tests/badge.svg)](https://github.com/aws-samples/amazon-ecs-dotnet-app-graviton/actions)
+
 <h1 align="center"> Deploy a .NET Web Application on Amazon ECS powered by Graviton2</h1>
 
 This repository contains a sample application code, used in demonstrating the step by step guide to deploy a .NET Application on Amazon ECS powered by Graviton2 based EC2 Instances.
@@ -9,11 +12,12 @@ Amazon Elastic Container Service ([Amazon ECS](https://aws.amazon.com/ecs/)) is 
 This guide utilizes [AWS Cloud9](https://aws.amazon.com/cloud9/) - a cloud-based integrated development environment (IDE) that lets you write, run, and debug your code with just a browser. The Cloud9 terminal provides a browser-based shell experience enabling you to install additional software, do a git push, or enter commands.
 
 This guide is split into following sections:
-* Create a Cloud9 environment with all the tools and pre-reqs using AWS CloudFormation template, [here](cfn/template.yaml) in the repository
-* Create a Docker image and push it to [Amazon ECR](https://aws.amazon.com/ecr/)
-* Create an [Amazon ECS Cluster](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/clusters.html)
-* Deploy the application to the Amazon ECS Cluster
-* Configure Monitoring and logging
+
+- Create a Cloud9 environment with all the tools and pre-reqs using AWS CloudFormation template, [here](cfn/template.yaml) in the repository
+- Create a Docker image and push it to [Amazon ECR](https://aws.amazon.com/ecr/)
+- Create an [Amazon ECS Cluster](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/clusters.html)
+- Deploy the application to the Amazon ECS Cluster
+- Configure Monitoring and logging
 
 For the guide, please follow [here](https://aws.amazon.com/getting-started/hands-on/deploy-dotnet-web-app-ecs-graviton/).
 
@@ -61,9 +65,11 @@ For the guide, please follow [here](https://aws.amazon.com/getting-started/hands
 - [LICENSE](#license)
 
 ## Architecture
+
 ![Architecture](docs/arch.png)
 
 The architecture is composed of following building blocks:
+
 - AWS Cloud9 environment facilitating creation of docker image, publication of image to Amazon ECR Repository
 - Amazon ECS Cluster with an [Application Load Balancer](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html) to balance the requests among the tasks launched by Amazon ECS Service
 - Database layer, powered by [Amazon Aurora MySQL](https://aws.amazon.com/rds/aurora/)
@@ -71,6 +77,7 @@ The architecture is composed of following building blocks:
 - [Amazon CloudWatch](https://aws.amazon.com/cloudwatch/) to enable logging and monitoring of the sample application deployed in Amazon ECS Cluster.
 
 ## Repository Structure
+
 - [`app`](/app/) directory contains the sample application code
 - [`cfn`](/cfn/) directory contains the CloudFormation template used to initialize the Cloud9 environment with sample application database
 - [`docs`](/docs/) directory contains the images and files associated with this documentation
@@ -85,7 +92,6 @@ The architecture is composed of following building blocks:
 Before you begin, be sure that you have a registered AWS Account and logged in with an IAM user with permissions specified in the AdministratorAccess. You can follow the steps illustrated [here](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/get-set-up-for-amazon-ecs.html).
 You're not required to follow steps other than **Sign up for AWS** and **Create an IAM user**.
 
-
 ### Code Usage
 
 This is a sample application, only to be used for demonstration of deploying a .Net application on Graviton2 instances behind Amazon ECS.
@@ -98,12 +104,12 @@ The getting started guide instructions will illustrate how to clone this reposit
 
 1. Deploy the latest CloudFormation template by following the link below for your preferred AWS region:
 
-|Region|Launch Template|
-|------|---------------|
-|**US East (N. Virginia)** (us-east-1) | [![Launch the ContainerizeDotNetOnECSGraviton2 Stack with CloudFormation](docs/deploy-to-aws.png)](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=ContainerizeDotNetOnECSGraviton2&templateURL=https://containerize-dotnet-app-on-ecs-graviton2-assets.s3-us-west-2.amazonaws.com/containerize_dotnet_app_ecs_graviton2.yml)|
-|**US East (Ohio)** (us-east-2) | [![Launch the ContainerizeDotNetOnECSGraviton2 Stack with CloudFormation](docs/deploy-to-aws.png)](https://console.aws.amazon.com/cloudformation/home?region=us-east-2#/stacks/new?stackName=ContainerizeDotNetOnECSGraviton2&templateURL=https://containerize-dotnet-app-on-ecs-graviton2-assets.s3-us-west-2.amazonaws.com/containerize_dotnet_app_ecs_graviton2.yml)|
-|**US West (Oregon)** (us-west-2) | [![Launch the ContainerizeDotNetOnECSGraviton2 Stack with CloudFormation](docs/deploy-to-aws.png)](https://console.aws.amazon.com/cloudformation/home?region=us-west-2#/stacks/new?stackName=ContainerizeDotNetOnECSGraviton2&templateURL=https://containerize-dotnet-app-on-ecs-graviton2-assets.s3-us-west-2.amazonaws.com/containerize_dotnet_app_ecs_graviton2.yml)|
-|**EU (Ireland)** (eu-west-1) | [![Launch the ContainerizeDotNetOnECSGraviton2 Stack with CloudFormation](docs/deploy-to-aws.png)](https://console.aws.amazon.com/cloudformation/home?region=eu-west-1#/stacks/new?stackName=ContainerizeDotNetOnECSGraviton2&templateURL=https://containerize-dotnet-app-on-ecs-graviton2-assets.s3-us-west-2.amazonaws.com/containerize_dotnet_app_ecs_graviton2.yml)|
+| Region                                | Launch Template                                                                                                                                                                                                                                                                                                                                                         |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **US East (N. Virginia)** (us-east-1) | [![Launch the ContainerizeDotNetOnECSGraviton2 Stack with CloudFormation](docs/deploy-to-aws.png)](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=ContainerizeDotNetOnECSGraviton2&templateURL=https://containerize-dotnet-app-on-ecs-graviton2-assets.s3-us-west-2.amazonaws.com/containerize_dotnet_app_ecs_graviton2.yml) |
+| **US East (Ohio)** (us-east-2)        | [![Launch the ContainerizeDotNetOnECSGraviton2 Stack with CloudFormation](docs/deploy-to-aws.png)](https://console.aws.amazon.com/cloudformation/home?region=us-east-2#/stacks/new?stackName=ContainerizeDotNetOnECSGraviton2&templateURL=https://containerize-dotnet-app-on-ecs-graviton2-assets.s3-us-west-2.amazonaws.com/containerize_dotnet_app_ecs_graviton2.yml) |
+| **US West (Oregon)** (us-west-2)      | [![Launch the ContainerizeDotNetOnECSGraviton2 Stack with CloudFormation](docs/deploy-to-aws.png)](https://console.aws.amazon.com/cloudformation/home?region=us-west-2#/stacks/new?stackName=ContainerizeDotNetOnECSGraviton2&templateURL=https://containerize-dotnet-app-on-ecs-graviton2-assets.s3-us-west-2.amazonaws.com/containerize_dotnet_app_ecs_graviton2.yml) |
+| **EU (Ireland)** (eu-west-1)          | [![Launch the ContainerizeDotNetOnECSGraviton2 Stack with CloudFormation](docs/deploy-to-aws.png)](https://console.aws.amazon.com/cloudformation/home?region=eu-west-1#/stacks/new?stackName=ContainerizeDotNetOnECSGraviton2&templateURL=https://containerize-dotnet-app-on-ecs-graviton2-assets.s3-us-west-2.amazonaws.com/containerize_dotnet_app_ecs_graviton2.yml) |
 
 This should take you to AWS CloudFormation Service - Create Stack screen.
 
@@ -117,12 +123,11 @@ This should take you to AWS CloudFormation Service - Create Stack screen.
 4. On the Step 3 - Configure stack options screen - leave the defaults, and don’t make any changes, just press Next button.
 
 5. On the Step 4 - Review screen, scroll to the bottom of the page and check all checkboxes, as per the screenshot below, then press Create stack for the template to be deployed.
-![Confirm Stack](docs/Step1-5.jpg)
+   ![Confirm Stack](docs/Step1-5.jpg)
 
 6. When the template is in the CREATE_COMPLETE you can find information about created environment by going to AWS Console -> CloudFormation, selecting the created stack and going to the Outputs tab. You will see information like on the screenshot below.
-![Stack Status](docs/Step1-6.jpg)
-Copy the values and paste them into a notepad, or local text file for easy reference in the later instructions.
-
+   ![Stack Status](docs/Step1-6.jpg)
+   Copy the values and paste them into a notepad, or local text file for easy reference in the later instructions.
 
 ## Module 2: Setup Cloud9 Workspace
 
@@ -131,27 +136,29 @@ Now that you have configured an AWS Cloud9 environment into your account, you wi
 ### Open your Cloud9 IDE
 
 1. You can launch and navigate to your Cloud9 workspace by clicking on Cloud9 IDE URL shown in your CloudFormation stack outputs.
-![Stack Outputs](docs/Step2-1.jpg)
-Then you should have an IDE environment as shown below:
-![Cloud9 Screen](docs/Step2-2.jpg)
+   ![Stack Outputs](docs/Step2-1.jpg)
+   Then you should have an IDE environment as shown below:
+   ![Cloud9 Screen](docs/Step2-2.jpg)
 
 1. In Cloud9 open a new **Terminal** window using Top Navigation Window Menu, select New Terminal, it should open a new Terminal window. Keep your AWS Cloud9 IDE opened in a tab as you’ll be using it for future steps.
 
 ### Expand Cloud9 Storage
 
 In order to accommodate dependencies, the underlying drive has already been expanded and you only need to increase the partition size. So on the terminal window run following 2 commands:
+
 ```
 sudo growpart /dev/xvda 1
 sudo resize2fs /dev/xvda1
 ```
 
 ### Download Sample Application Code
+
 Download the sample application source code (from this repository) to your AWS Cloud9 IDE environment by running the following command in the Cloud9 terminal window:
 
 `git clone https://github.com/aws-samples/amazon-ecs-dotnet-app-graviton`
 
-
 ## Module 3: Create and Publish Docker Image
+
 In previous modules, you launched an AWS CloudFormation stack, which created a new AWS VPC, Public and Private subnet pairs in 2 Availability Zones, 1 AWS RDS Aurora instance in a Private subnet, and also initialized an AWS Cloud9 environment to issue AWS Command Line Interface(CLI) commands via command line.
 
 You also cloned a sample .NET application from Github on the Cloud9 Bash Terminal, and built a .NET package.
@@ -203,56 +210,59 @@ Keep this information on a separate notepad as you'll need this image repository
 In this step you'll create a Dockerfile and then build a docker image for your sample application.
 
 1. Move to the source code directory
- ```
- cd ~/environment/amazon-ecs-dotnet-app-graviton/app/
- ```
+
+```
+cd ~/environment/amazon-ecs-dotnet-app-graviton/app/
+```
+
 2. Create Dockerfile in the root of the project
- ```
- touch Dockerfile
- ```
+
+```
+touch Dockerfile
+```
 
 3. Open Dockerfile either in Cloud9 IDE or via command-line text editor such as nano or vi, and the commands listed below. Each command has an inline documentation below to explain the purpose of the command.
 
- ```
- FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
- WORKDIR /src
+```
+FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
+WORKDIR /src
 
- # These lines copy MvcMovie.csproj project files in the current directory
- # and then restore for the specified runtime, using -r.
- COPY ["MvcMovie.csproj", "./"]
- RUN dotnet restore "MvcMovie.csproj" -r linux-musl-arm64
+# These lines copy MvcMovie.csproj project files in the current directory
+# and then restore for the specified runtime, using -r.
+COPY ["MvcMovie.csproj", "./"]
+RUN dotnet restore "MvcMovie.csproj" -r linux-musl-arm64
 
- # Build dotnet project and publishes the application and its dependencies to a folder for deployment to a hosting system.
- COPY . .
- WORKDIR "/src/."
- RUN dotnet publish "MvcMovie.csproj" -c Release -o /app/publish -r linux-musl-arm64 --self-contained false --no-restore
+# Build dotnet project and publishes the application and its dependencies to a folder for deployment to a hosting system.
+COPY . .
+WORKDIR "/src/."
+RUN dotnet publish "MvcMovie.csproj" -c Release -o /app/publish -r linux-musl-arm64 --self-contained false --no-restore
 
 
- # Docker build command
- # You need to use an architecture-specific tag if you want to target ARM based instances.
- # Note that .NET is only supported on Alpine on ARM64 and x64, and not ARM32.
- FROM mcr.microsoft.com/dotnet/aspnet:5.0-alpine-arm64v8
- WORKDIR /app
- EXPOSE 80
- COPY --from=build /app/publish .
- ENTRYPOINT ["dotnet", "MvcMovie.dll"]
- ```
+# Docker build command
+# You need to use an architecture-specific tag if you want to target ARM based instances.
+# Note that .NET is only supported on Alpine on ARM64 and x64, and not ARM32.
+FROM mcr.microsoft.com/dotnet/aspnet:5.0-alpine-arm64v8
+WORKDIR /app
+EXPOSE 80
+COPY --from=build /app/publish .
+ENTRYPOINT ["dotnet", "MvcMovie.dll"]
+```
 
 4. Build and publish docker image with tag movie-app. Tag your image with the Amazon ECR registry, repository, and optional image tag name combination to use. For detail you can refer here later. The commands below can take a few minutes.
 
- ```
- docker build -t movie-app .
- docker tag movie-app $IMAGE_REPO_URI
- ```
+```
+docker build -t movie-app .
+docker tag movie-app $IMAGE_REPO_URI
+```
 
- 5. Confirm the image is created successfully
+5.  Confirm the image is created successfully
 
- ```
- docker images movie-app
- ```
+```
+docker images movie-app
+```
 
- The command line outputs should look something like below:
- ![Docker Images](docs/Step3-3.png)
+The command line outputs should look something like below:
+![Docker Images](docs/Step3-3.png)
 
 ### Publish Docker Image
 
@@ -275,9 +285,11 @@ Output should look like this
 ![ECR Docker Image](docs/Step3-4.png)
 
 ## Module 4: Create Amazon ECS Cluster
+
 In previous modules, you created a Graviton2 Build Platform, created and published a Docker container into an Amazon ECR Repository. In this module, you'll deploy the newly published container into Amazon Elastic Container Service (ECS).
 
 ### Enable new ECS Experience
+
 From the AWS Management Console go to Amazon Elastic Container Service, either via search function or from the Services drop down button, and looking under the category - Containers.
 
 The screenshots in this section may look different for those using old ECS Experience, ensure that where applicable, in left hand navigation pane New ECS Experience is enabled. If navigation pane is not visible, for some services, it may require clicking the hamburger button, to expand the navigation pane.
@@ -285,12 +297,13 @@ The screenshots in this section may look different for those using old ECS Exper
 ![New Experience](docs/Step4-1.png)
 
 ### Create ECS Cluster
+
 In this step you'll create a new ECS Cluster.
 
 1. Click on Clusters menu in the navigation pane, and click on Create Cluster button.
 
 2. In **Step 1: Select cluster template**, choose **EC2 Linux + Networking.....** option and click **Next step** button
-![Create Cluster](docs/Step4-2.png)
+   ![Create Cluster](docs/Step4-2.png)
 
 3. In **Step 2 : Configure cluster**, use following values for the specified labels, and leave the rest default.
 
@@ -325,7 +338,6 @@ In this step you'll create a new ECS Cluster.
 ![Cluster](docs/Step4-6.png)
 
 At this stage, you have an ECS Cluster created, with private subnets, however you don’t have any service/tasks running. For that you need to create a [Task Definition](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definitions.html).
-
 
 ### Create ECS Task Definition
 
@@ -363,13 +375,13 @@ In the **Environment Section** section under **Environment variables**, Add foll
 
 Note: Where applicable values end with double colon symbols (::).
 
-|Key|Value/valueFrom|value |
-|------|---------------|-----|
-|DBHOST|	ValueFrom|	`<RDSSecretARN from CloudFormation Outputs>:host::`|
-|DBNAME|	ValueFrom|	`<RDSSecretARN from CloudFormation Outputs>:dbname::`|
-|DBUSER|	ValueFrom|	`<RDSSecretARN from CloudFormation Outputs>:username::`|
-|DBPASS|	ValueFrom|	`<RDSSecretARN from CloudFormation Outputs>:password::`|
-|DBSSLMODE|	Value|	`none`|
+| Key       | Value/valueFrom | value                                                   |
+| --------- | --------------- | ------------------------------------------------------- |
+| DBHOST    | ValueFrom       | `<RDSSecretARN from CloudFormation Outputs>:host::`     |
+| DBNAME    | ValueFrom       | `<RDSSecretARN from CloudFormation Outputs>:dbname::`   |
+| DBUSER    | ValueFrom       | `<RDSSecretARN from CloudFormation Outputs>:username::` |
+| DBPASS    | ValueFrom       | `<RDSSecretARN from CloudFormation Outputs>:password::` |
+| DBSSLMODE | Value           | `none`                                                  |
 
 - **Key**: name of the env variable for your application, e.g. DBHOST
 - **Value/ValueFrom** dropdown value: value for hard coded values, and ValueFrom for the values retrieved from AWS Systems manager Parameter Store/AWS Secrets Manager.
@@ -393,6 +405,7 @@ Leave rest of the settings as is and press Add button at the bottom of the scree
 Review the Service and Tasks and you’ll see no records. This means that although your Task Definition is complete but no Tasks are running, so in the next section you'll create Amazon ECS Service, which will launch a [Load balanced Amazon ECS Service](https://docs.aws.amazon.com/AmazonECS/latest/userguide/service-load-balancing.html) and runs tasks using the task definition you created in this module.
 
 ## Module 5: Deploy the Application to Amazon ECS
+
 So far in the guide you have prepared the foundational environment for your sample application in Module 1 and Module 2. In Module 3 you built and published the Docker image for the sample application, and in Module 4 you created the building blocks required to launch a Load Balanced [Amazon ECS Service](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs_services.html) that will instantiate tasks behind the AWS Application Load Balancer.
 
 ### Create ECS Service
@@ -542,15 +555,15 @@ aws ecs update-cluster-settings --cluster Graviton2ECSCluster --settings name=co
 
 4. Container Insights provides metrics for each of these resources to help provide visibility on what is going on within the resources. Click on each of the resource to see the metrics as show below
 
-    **Cluster metrics** - this provides a view of the CPU Utilisation, Memory Utilisation and Network Transferred and Received. It also provides a view of the count of Container Instance, Task and Service within the cluster.
+   **Cluster metrics** - this provides a view of the CPU Utilisation, Memory Utilisation and Network Transferred and Received. It also provides a view of the count of Container Instance, Task and Service within the cluster.
 
-    ![Cluster Metrics](docs/Step6-5.png)
+   ![Cluster Metrics](docs/Step6-5.png)
 
-    **Service metrics** - provides a view of the aggregated metrics of the tasks running within the service and also the performance for each of the tasks.
+   **Service metrics** - provides a view of the aggregated metrics of the tasks running within the service and also the performance for each of the tasks.
 
-    **Task metrics** - provides a view of the metrics for each task running in the cluster.
+   **Task metrics** - provides a view of the metrics for each task running in the cluster.
 
-    ![Cluster Metrics 2](docs/Step6-6.png)
+   ![Cluster Metrics 2](docs/Step6-6.png)
 
 ### Analysing Application Logs via CloudWatch
 
@@ -567,7 +580,6 @@ While creating the Task Definition as shown in Module 4, you enabled Log Configu
 3. Select a log stream to display the application logs. On the top right corner of the screen you can specify filters based on date and time to retrieve the logs.
 
 ![CloudWatch Logs 3](docs/Step6-9.png)
-
 
 ## Module 7: Clean Up
 

@@ -1,6 +1,7 @@
 # Local development
 /config.mk
 /cfn/packaged.template
+/packaged.zip
 
 _ReSharper.*
 _ReSharper.*/
