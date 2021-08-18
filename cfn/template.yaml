@@ -701,7 +701,7 @@ Resources:
         SecretStringTemplate: !Join ['', ['{"username": "', !Ref DBUsername, '"}' ]]
         GenerateStringKey: "password"
         PasswordLength: 16
-        ExcludeCharacters: '"@/\'
+        ExcludePunctuation: true
   SecretRDSInstanceAttachment:
     Type: "AWS::SecretsManager::SecretTargetAttachment"
     Properties:
