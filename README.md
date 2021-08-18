@@ -12,8 +12,8 @@ This guide is split into following sections:
 * Create a Cloud9 environment with all the tools and pre-reqs using AWS CloudFormation template, [here](cfn/template.yaml) in the repository
 * Create a Docker image and push it to [Amazon ECR](https://aws.amazon.com/ecr/)
 * Create an [Amazon ECS Cluster](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/clusters.html)
-* Deploy the application to the Amazon ECS Cluster 
-* Configure Monitoring and logging 
+* Deploy the application to the Amazon ECS Cluster
+* Configure Monitoring and logging
 
 For the guide, please follow [here](https://aws.amazon.com/getting-started/hands-on/deploy-dotnet-web-app-ecs-graviton/).
 
@@ -82,7 +82,7 @@ The architecture is composed of following building blocks:
 
 ### Prerequisites
 
-Before you begin, be sure that you have a registered AWS Account and logged in with an IAM user with permissions specified in the AdministratorAccess. You can follow the steps illustrated [here](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/get-set-up-for-amazon-ecs.html). 
+Before you begin, be sure that you have a registered AWS Account and logged in with an IAM user with permissions specified in the AdministratorAccess. You can follow the steps illustrated [here](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/get-set-up-for-amazon-ecs.html).
 You're not required to follow steps other than **Sign up for AWS** and **Create an IAM user**.
 
 
@@ -107,11 +107,11 @@ The getting started guide instructions will illustrate how to clone this reposit
 
 This should take you to AWS CloudFormation Service - Create Stack screen.
 
-2. On the Create Stack - Step 1: Specify template screen, confirm that the URL https://containerize-dotnet-app-on-ecs-graviton2-assets.s3-us-west-2.amazonaws.com/containerize_dotnet_app_ecs_graviton2.yml is entered in the Amazon S3 URL field and press Next button. 
+2. On the Create Stack - Step 1: Specify template screen, confirm that the URL https://containerize-dotnet-app-on-ecs-graviton2-assets.s3-us-west-2.amazonaws.com/containerize_dotnet_app_ecs_graviton2.yml is entered in the Amazon S3 URL field and press Next button.
    ![Create Stack](docs/Step1-2.jpg)
 
 3. On the Step 2 - Specify stack details screen, you can specify the stack name, network configuration, as well as Amazon RDS configuration. All required fields are already pre-filled with the default values You can leave them as default and press Next button.
-   
+
 ![Specify Stack Details](docs/Step1-3.jpg)
 
 4. On the Step 3 - Configure stack options screen - leave the defaults, and don’t make any changes, just press Next button.
@@ -130,7 +130,7 @@ Now that you have configured an AWS Cloud9 environment into your account, you wi
 
 ### Open your Cloud9 IDE
 
-1. You can launch and navigate to your Cloud9 workspace by clicking on Cloud9 IDE URL shown in your CloudFormation stack outputs. 
+1. You can launch and navigate to your Cloud9 workspace by clicking on Cloud9 IDE URL shown in your CloudFormation stack outputs.
 ![Stack Outputs](docs/Step2-1.jpg)
 Then you should have an IDE environment as shown below:
 ![Cloud9 Screen](docs/Step2-2.jpg)
@@ -150,17 +150,17 @@ Download the sample application source code (from this repository) to your AWS C
 
 `git clone https://github.com/aws-samples/amazon-ecs-dotnet-app-graviton`
 
-   
+
 ## Module 3: Create and Publish Docker Image
 In previous modules, you launched an AWS CloudFormation stack, which created a new AWS VPC, Public and Private subnet pairs in 2 Availability Zones, 1 AWS RDS Aurora instance in a Private subnet, and also initialized an AWS Cloud9 environment to issue AWS Command Line Interface(CLI) commands via command line.
 
-You also cloned a sample .NET application from Github on the Cloud9 Bash Terminal, and built a .NET package. 
+You also cloned a sample .NET application from Github on the Cloud9 Bash Terminal, and built a .NET package.
 This module gives step by step instructions for the Build and Publish stage of Sample Application.
 
 ### Setup Environment Variables
 
 1. Open the AWS Cloud9 new terminal window, following the instruction listed in Module2
-   
+
 2. Configure the AWS CLI with your current region as default (you can retrieve the region you chose from instance metadata)
 
 ```
@@ -203,8 +203,8 @@ Keep this information on a separate notepad as you'll need this image repository
 In this step you'll create a Dockerfile and then build a docker image for your sample application.
 
 1. Move to the source code directory
- ``` 
- cd ~/environment/amazon-ecs-dotnet-app-graviton/app/ 
+ ```
+ cd ~/environment/amazon-ecs-dotnet-app-graviton/app/
  ```
 2. Create Dockerfile in the root of the project
  ```
@@ -217,7 +217,7 @@ In this step you'll create a Dockerfile and then build a docker image for your s
  FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
  WORKDIR /src
 
- # These lines copy MvcMovie.csproj project files in the current directory 
+ # These lines copy MvcMovie.csproj project files in the current directory
  # and then restore for the specified runtime, using -r.
  COPY ["MvcMovie.csproj", "./"]
  RUN dotnet restore "MvcMovie.csproj" -r linux-musl-arm64
@@ -229,7 +229,7 @@ In this step you'll create a Dockerfile and then build a docker image for your s
 
 
  # Docker build command
- # You need to use an architecture-specific tag if you want to target ARM based instances. 
+ # You need to use an architecture-specific tag if you want to target ARM based instances.
  # Note that .NET is only supported on Alpine on ARM64 and x64, and not ARM32.
  FROM mcr.microsoft.com/dotnet/aspnet:5.0-alpine-arm64v8
  WORKDIR /app
@@ -285,7 +285,7 @@ The screenshots in this section may look different for those using old ECS Exper
 ![New Experience](docs/Step4-1.png)
 
 ### Create ECS Cluster
-In this step you'll create a new ECS Cluster. 
+In this step you'll create a new ECS Cluster.
 
 1. Click on Clusters menu in the navigation pane, and click on Create Cluster button.
 
@@ -293,7 +293,7 @@ In this step you'll create a new ECS Cluster.
 ![Create Cluster](docs/Step4-2.png)
 
 3. In **Step 2 : Configure cluster**, use following values for the specified labels, and leave the rest default.
-   
+
 **Cluster name**: Graviton2ECSCluster
 
 **EC2 Instance type**: t4g.medium
@@ -308,7 +308,7 @@ In this step you'll create a new ECS Cluster.
 
 **Subnets**: select 2 private subnets **TargetVPC-private-a-web** and **TargetVPC-private-b-web**, one after another
 
-**Security Group**: select **ECSServiceSG** from the dropdown. You can click on the Security group selected to see the inbound and outbound rules. 
+**Security Group**: select **ECSServiceSG** from the dropdown. You can click on the Security group selected to see the inbound and outbound rules.
 
 ![ECS Networking](docs/Step4-4.png)
 
@@ -355,11 +355,11 @@ It should look like below
 
 ![Container Definition](docs/Step4-9.jpg)
 
-5. Next you have to add environment variables for the container to be able to access the Database instance deployed by the CloudFormation template in Module 1. 
+5. Next you have to add environment variables for the container to be able to access the Database instance deployed by the CloudFormation template in Module 1.
 
 Also refer the value of the key **RDSSecretARN**, you copy pasted for later reference in the Module 2. you'll need it now.
 
-In the **Environment Section** section under **Environment variables**, Add following environment variables. 
+In the **Environment Section** section under **Environment variables**, Add following environment variables.
 
 Note: Where applicable values end with double colon symbols (::).
 
@@ -372,7 +372,7 @@ Note: Where applicable values end with double colon symbols (::).
 |DBSSLMODE|	Value|	`none`|
 
 - **Key**: name of the env variable for your application, e.g. DBHOST
-- **Value/ValueFrom** dropdown value: value for hard coded values, and ValueFrom for the values retrieved from AWS Systems manager Parameter Store/AWS Secrets Manager. 
+- **Value/ValueFrom** dropdown value: value for hard coded values, and ValueFrom for the values retrieved from AWS Systems manager Parameter Store/AWS Secrets Manager.
 - **Value**: This guide demonstrates using AWS Secrets manager to store database credentials securely, so the value will be in the format as `arn:aws:secretsmanager:region:<aws_account_id>:secret:secret-name:json-key:version-stage:version-id` specified by the ECS documentation [here](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/specifying-sensitive-data-secrets.html).
 
 ![Container Environment Variables](docs/Step4-10.png)
@@ -455,7 +455,7 @@ You can note the Desired and Running count to verify that that ECS Service has s
 
 ### Enable Session Management for Sample Application
 
-Sample .Net web application has Login Functionality, which enables logged in user to edit the records, stored in Aurora DB. 
+Sample .Net web application has Login Functionality, which enables logged in user to edit the records, stored in Aurora DB.
 
 For the session management, this guide takes the simplest route by enabling sticky session, instead of adding complexity in the .Net sample app.
 
@@ -470,7 +470,7 @@ So the next step is to modify the Load balancing target group created by the ECS
 3. On the Group details tab, in the Attributes section, choose Edit.
 
 ![Enable Sticky Session](docs/Step5-8.jpg)
-On the Edit attributes page, 
+On the Edit attributes page,
 
 4. Select Stickiness.
 
@@ -511,15 +511,15 @@ This step completes the deployment of Sample .NET Web Application on Amazon ECS.
 
 ## Module 6: Monitoring and Logging
 
-This final module will focus on how you enable monitoring for your ECS environment using Amazon CloudWatch [Container Insights](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/ContainerInsights.html). 
+This final module will focus on how you enable monitoring for your ECS environment using Amazon CloudWatch [Container Insights](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/ContainerInsights.html).
 
-This can be used to collect, aggregate, and summarise metrics and logs from your containerised application. 
+This can be used to collect, aggregate, and summarise metrics and logs from your containerised application.
 
 Container Insights also provides diagnostic information, such as container restart failures, to help you isolate issues and resolve them quickly. You can also set CloudWatch alarms on metrics that Container Insights collects.
 
 ### Confirm Container Insights is Enabled
 
-1. If for any reason, you missed to enable Container Insights in Module 4, you can enable it via AWS CLI on existing Amazon ECS clusters run the command below: 
+1. If for any reason, you missed to enable Container Insights in Module 4, you can enable it via AWS CLI on existing Amazon ECS clusters run the command below:
 
 ```
 aws ecs update-cluster-settings --cluster Graviton2ECSCluster --settings name=containerInsights,value=enabled --region ${AWS_REGION}
@@ -560,7 +560,7 @@ While creating the Task Definition as shown in Module 4, you enabled Log Configu
 
 ![CloudWatch Logs 1](docs/Step6-7.png)
 
-2. The Log Group that was configured in Module 4 while creating the task definition is **/ecs/Graviton2ECSTask**. Select this log group to show the log streams from the containers in the ECS task. Sending logs to Cloudwatch logs enables you to view different logs from your containers in one convenient location, and it prevents your container logs from taking up disk space on your container instances. 
+2. The Log Group that was configured in Module 4 while creating the task definition is **/ecs/Graviton2ECSTask**. Select this log group to show the log streams from the containers in the ECS task. Sending logs to Cloudwatch logs enables you to view different logs from your containers in one convenient location, and it prevents your container logs from taking up disk space on your container instances.
 
 ![CloudWatch Logs 2](docs/Step6-8.png)
 
@@ -615,7 +615,7 @@ In the steps below, you'll run through the steps to clean up the resources you c
 
 1. In a new browser window, open the [Amazon ECS Console](https://console.aws.amazon.com/ecs/)
 2. In the left navigation pane, click on **Clusters**
-3. **Interim step** - In the navigation pane, **turn off New ECS Experience**, to use the old console. This is required in the interim until the delete cluster workflow is introduced in the new Amazon ECS console, as mentioned in the Deleting a cluster documentation 
+3. **Interim step** - In the navigation pane, **turn off New ECS Experience**, to use the old console. This is required in the interim until the delete cluster workflow is introduced in the new Amazon ECS console, as mentioned in the Deleting a cluster documentation
 4. Click on the cluster **Graviton2ECSCluster** to open
 5. Click on **Delete cluster** button at the top of the page
 6. Confirm your action
@@ -644,4 +644,3 @@ See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more inform
 ## LICENSE
 
 This library is licensed under the MIT-0 License. See the [LICENSE](/LICENSE) file.
-

@@ -1,48 +1,50 @@
-AWSTemplateFormatVersion: 2010-09-09
-Transform: AWS::Serverless-2016-10-31
+AWSTemplateFormatVersion: "2010-09-09"
+
 Description: Containerize .Net on Graviton 2 Environment
 
 Metadata:
+  Version: 0.0.1
+
   AWS::CloudFormation::Interface:
     ParameterGroups:
-      -
-        Label:
-          default: "Network Configuration"
+      - Label:
+          default: Network Configuration
         Parameters:
           - TargetVPCName
-      -
-        Label:
-          default: "Amazon RDS Configuration"
+      - Label:
+          default: Amazon RDS Configuration
         Parameters:
           - DBName
           - DBUsername
     ParameterLabels:
       TargetVPCName:
-        default: "Target VPC name"
+        default: Target VPC name
       DBName:
-        default: "Database name"
+        default: Database name
       DBUsername:
-        default: "Master username"
+        default: Master username
 
 Parameters:
   TargetVPCName:
     Description: The name of the Target VPC being created.
     Type: String
     Default: TargetVPC
+
   DBName:
-    Default: moviedb
     Description: Movie database
     Type: String
-    MinLength: '1'
-    MaxLength: '64'
+    Default: moviedb
+    MinLength: "1"
+    MaxLength: "64"
     AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
     ConstraintDescription: Must begin with a letter and contain only alphanumeric characters.
+
   DBUsername:
     Description: Username for MySQL database access
     Type: String
     Default: admin
-    MinLength: '1'
-    MaxLength: '16'
+    MinLength: "1"
+    MaxLength: "16"
     AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
     ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
 
@@ -62,24 +64,25 @@ Mappings:
       CIDR: 10.0.101.0/24
     Private11:
       CIDR: 10.0.201.0/24
+
   RegionMap:
-    us-east-1:      # US East (N. Virginia)
+    us-east-1: # US East (N. Virginia)
       AZs: [a, b]
-    us-east-2:      # US East (Ohio)
+    us-east-2: # US East (Ohio)
       AZs: [a, b]
-    us-west-1:      # US West (N. California)
+    us-west-1: # US West (N. California)
       AZs: [a, b]
-    us-west-2:      # US West (Oregon)
+    us-west-2: # US West (Oregon)
       AZs: [a, b]
     ap-southeast-1: # Asia Pacific (Singapore)
       AZs: [a, b]
     ap-southeast-2: # Asia Pacific (Sydney)
       AZs: [a, b]
-    eu-west-1:      # Europe (Ireland)
+    eu-west-1: # Europe (Ireland)
       AZs: [a, b]
-    eu-west-2:      # Europe (London)
+    eu-west-2: # Europe (London)
       AZs: [a, b]
-    eu-central-1:   # Europe (Frankfurt)
+    eu-central-1: # Europe (Frankfurt)
       AZs: [a, b]
 
 Resources:
@@ -88,473 +91,424 @@ Resources:
     Properties:
       EnableDnsSupport: true
       EnableDnsHostnames: true
-      CidrBlock:
-        Fn::FindInMap:
+      CidrBlock: !FindInMap
         - SubnetConfig
         - TargetVPC
         - CIDR
       Tags:
-      - Key: Name
-        Value:
-          Ref: TargetVPCName
+        - Key: Name
+          Value: !Ref TargetVPCName
+
   PublicSubnet0:
     Type: AWS::EC2::Subnet
     Properties:
-      VpcId:
-        Ref: TargetVPC
-      AvailabilityZone:
-        Fn::Sub:
+      VpcId: !Ref TargetVPC
+      AvailabilityZone: !Sub
         - ${AWS::Region}${AZ}
-        - AZ:
-            Fn::Select:
+        - AZ: !Select
             - 0
-            - Fn::FindInMap:
+            - !FindInMap
               - RegionMap
-              - Ref: AWS::Region
+              - !Ref AWS::Region
               - AZs
-      CidrBlock:
-        Fn::FindInMap:
+      CidrBlock: !FindInMap
         - SubnetConfig
         - Public0
         - CIDR
       MapPublicIpOnLaunch: false
       Tags:
-      - Key: Network
-        Value: Public
-      - Key: Name
-        Value:
-          Fn::Join:
-          - ''
-          - - Ref: TargetVPCName
-            - -public-
-            - Fn::Select:
-              - 0
-              - Fn::FindInMap:
-                - RegionMap
-                - Ref: AWS::Region
-                - AZs
+        - Key: Network
+          Value: Public
+        - Key: Name
+          Value: !Join
+            - ""
+            - - !Ref TargetVPCName
+              - -public-
+              - !Select
+                - 0
+                - !FindInMap
+                  - RegionMap
+                  - !Ref AWS::Region
+                  - AZs
+
   PublicSubnet1:
     Type: AWS::EC2::Subnet
     Properties:
-      VpcId:
-        Ref: TargetVPC
-      AvailabilityZone:
-        Fn::Sub:
+      VpcId: !Ref TargetVPC
+      AvailabilityZone: !Sub
         - ${AWS::Region}${AZ}
-        - AZ:
-            Fn::Select:
+        - AZ: !Select
             - 1
-            - Fn::FindInMap:
+            - !FindInMap
               - RegionMap
-              - Ref: AWS::Region
+              - !Ref AWS::Region
               - AZs
-      CidrBlock:
-        Fn::FindInMap:
+      CidrBlock: !FindInMap
         - SubnetConfig
         - Public1
         - CIDR
       MapPublicIpOnLaunch: false
       Tags:
-      - Key: Network
-        Value: Public
-      - Key: Name
-        Value:
-          Fn::Join:
-          - ''
-          - - Ref: TargetVPCName
-            - -public-
-            - Fn::Select:
-              - 1
-              - Fn::FindInMap:
-                - RegionMap
-                - Ref: AWS::Region
-                - AZs
+        - Key: Network
+          Value: Public
+        - Key: Name
+          Value: !Join
+            - ""
+            - - !Ref TargetVPCName
+              - -public-
+              - !Select
+                - 1
+                - !FindInMap
+                  - RegionMap
+                  - !Ref AWS::Region
+                  - AZs
+
   PrivateSubnet00:
     Type: AWS::EC2::Subnet
     Properties:
-      VpcId:
-        Ref: TargetVPC
-      AvailabilityZone:
-        Fn::Sub:
+      VpcId: !Ref TargetVPC
+      AvailabilityZone: !Sub
         - ${AWS::Region}${AZ}
-        - AZ:
-            Fn::Select:
+        - AZ: !Select
             - 0
-            - Fn::FindInMap:
+            - !FindInMap
               - RegionMap
-              - Ref: AWS::Region
+              - !Ref AWS::Region
               - AZs
-      CidrBlock:
-        Fn::FindInMap:
+      CidrBlock: !FindInMap
         - SubnetConfig
         - Private00
         - CIDR
       Tags:
-      - Key: Network
-        Value: Private
-      - Key: Name
-        Value:
-          Fn::Join:
-          - ''
-          - - Ref: TargetVPCName
-            - -private-
-            - Fn::Select:
-              - 0
-              - Fn::FindInMap:
-                - RegionMap
-                - Ref: AWS::Region
-                - AZs
-            - -web
+        - Key: Network
+          Value: Private
+        - Key: Name
+          Value: !Join
+            - ""
+            - - !Ref TargetVPCName
+              - -private-
+              - !Select
+                - 0
+                - !FindInMap
+                  - RegionMap
+                  - !Ref AWS::Region
+                  - AZs
+              - -web
+
   PrivateSubnet01:
     Type: AWS::EC2::Subnet
     Properties:
-      VpcId:
-        Ref: TargetVPC
-      AvailabilityZone:
-        Fn::Sub:
+      VpcId: !Ref TargetVPC
+      AvailabilityZone: !Sub
         - ${AWS::Region}${AZ}
-        - AZ:
-            Fn::Select:
+        - AZ: !Select
             - 0
-            - Fn::FindInMap:
+            - !FindInMap
               - RegionMap
-              - Ref: AWS::Region
+              - !Ref AWS::Region
               - AZs
-      CidrBlock:
-        Fn::FindInMap:
+      CidrBlock: !FindInMap
         - SubnetConfig
         - Private01
         - CIDR
       Tags:
-      - Key: Network
-        Value: Private
-      - Key: Name
-        Value:
-          Fn::Join:
-          - ''
-          - - Ref: TargetVPCName
-            - -private-
-            - Fn::Select:
-              - 0
-              - Fn::FindInMap:
-                - RegionMap
-                - Ref: AWS::Region
-                - AZs
-            - -db
+        - Key: Network
+          Value: Private
+        - Key: Name
+          Value: !Join
+            - ""
+            - - !Ref TargetVPCName
+              - -private-
+              - !Select
+                - 0
+                - !FindInMap
+                  - RegionMap
+                  - !Ref AWS::Region
+                  - AZs
+              - -db
+
   PrivateSubnet10:
     Type: AWS::EC2::Subnet
     Properties:
-      VpcId:
-        Ref: TargetVPC
-      AvailabilityZone:
-        Fn::Sub:
+      VpcId: !Ref TargetVPC
+      AvailabilityZone: !Sub
         - ${AWS::Region}${AZ}
-        - AZ:
-            Fn::Select:
+        - AZ: !Select
             - 1
-            - Fn::FindInMap:
+            - !FindInMap
               - RegionMap
-              - Ref: AWS::Region
+              - !Ref AWS::Region
               - AZs
-      CidrBlock:
-        Fn::FindInMap:
+      CidrBlock: !FindInMap
         - SubnetConfig
         - Private10
         - CIDR
       Tags:
-      - Key: Network
-        Value: Private
-      - Key: Name
-        Value:
-          Fn::Join:
-          - ''
-          - - Ref: TargetVPCName
-            - -private-
-            - Fn::Select:
-              - 1
-              - Fn::FindInMap:
-                - RegionMap
-                - Ref: AWS::Region
-                - AZs
-            - -web
+        - Key: Network
+          Value: Private
+        - Key: Name
+          Value: !Join
+            - ""
+            - - !Ref TargetVPCName
+              - -private-
+              - !Select
+                - 1
+                - !FindInMap
+                  - RegionMap
+                  - !Ref AWS::Region
+                  - AZs
+              - -web
+
   PrivateSubnet11:
     Type: AWS::EC2::Subnet
     Properties:
-      VpcId:
-        Ref: TargetVPC
-      AvailabilityZone:
-        Fn::Sub:
+      VpcId: !Ref TargetVPC
+      AvailabilityZone: !Sub
         - ${AWS::Region}${AZ}
-        - AZ:
-            Fn::Select:
+        - AZ: !Select
             - 1
-            - Fn::FindInMap:
+            - !FindInMap
               - RegionMap
-              - Ref: AWS::Region
+              - !Ref AWS::Region
               - AZs
-      CidrBlock:
-        Fn::FindInMap:
+      CidrBlock: !FindInMap
         - SubnetConfig
         - Private11
         - CIDR
       Tags:
-      - Key: Network
-        Value: Private
-      - Key: Name
-        Value:
-          Fn::Join:
-          - ''
-          - - Ref: TargetVPCName
-            - -private-
-            - Fn::Select:
-              - 1
-              - Fn::FindInMap:
-                - RegionMap
-                - Ref: AWS::Region
-                - AZs
-            - -db
+        - Key: Network
+          Value: Private
+        - Key: Name
+          Value: !Join
+            - ""
+            - - !Ref TargetVPCName
+              - -private-
+              - !Select
+                - 1
+                - !FindInMap
+                  - RegionMap
+                  - !Ref AWS::Region
+                  - AZs
+              - -db
+
   InternetGateway:
     Type: AWS::EC2::InternetGateway
     Properties:
       Tags:
-      - Key: Name
-        Value:
-          Fn::Join:
-          - ''
-          - - Ref: TargetVPCName
-            - -IGW
+        - Key: Name
+          Value: !Join
+            - ""
+            - - !Ref TargetVPCName
+              - -IGW
+
   GatewayToInternet:
     Type: AWS::EC2::VPCGatewayAttachment
     Properties:
-      VpcId:
-        Ref: TargetVPC
-      InternetGatewayId:
-        Ref: InternetGateway
+      VpcId: !Ref TargetVPC
+      InternetGatewayId: !Ref InternetGateway
+
   PublicRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId:
-        Ref: TargetVPC
+      VpcId: !Ref TargetVPC
       Tags:
-      - Key: Network
-        Value: Public
-      - Key: Name
-        Value:
-          Fn::Join:
-          - ''
-          - - Ref: TargetVPCName
-            - -public-route-table
+        - Key: Network
+          Value: Public
+        - Key: Name
+          Value: !Join
+            - ""
+            - - !Ref TargetVPCName
+              - -public-route-table
+
   PublicRoute:
     Type: AWS::EC2::Route
     DependsOn: GatewayToInternet
     Properties:
-      RouteTableId:
-        Ref: PublicRouteTable
-      DestinationCidrBlock: '0.0.0.0/0'
-      GatewayId:
-        Ref: InternetGateway
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
   PublicSubnetRouteTableAssociation0:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId:
-        Ref: PublicSubnet0
-      RouteTableId:
-        Ref: PublicRouteTable
+      SubnetId: !Ref PublicSubnet0
+      RouteTableId: !Ref PublicRouteTable
+
   PublicSubnetRouteTableAssociation1:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId:
-        Ref: PublicSubnet1
-      RouteTableId:
-        Ref: PublicRouteTable
+      SubnetId: !Ref PublicSubnet1
+      RouteTableId: !Ref PublicRouteTable
+
   PublicNetworkAcl:
     Type: AWS::EC2::NetworkAcl
     Properties:
-      VpcId:
-        Ref: TargetVPC
+      VpcId: !Ref TargetVPC
       Tags:
-      - Key: Network
-        Value: Public
-      - Key: Name
-        Value:
-          Fn::Join:
-          - ''
-          - - Ref: TargetVPCName
-            - -public-nacl
+        - Key: Network
+          Value: Public
+        - Key: Name
+          Value: !Join
+            - ""
+            - - !Ref TargetVPCName
+              - -public-nacl
+
   InboundHTTPPublicNetworkAclEntry:
     Type: AWS::EC2::NetworkAclEntry
     Properties:
-      NetworkAclId:
-        Ref: PublicNetworkAcl
+      NetworkAclId: !Ref PublicNetworkAcl
       RuleNumber: 100
       Protocol: 6
       RuleAction: allow
       Egress: false
-      CidrBlock: '0.0.0.0/0'
+      CidrBlock: 0.0.0.0/0
       PortRange:
         From: 0
         To: 65535
+
   OutboundPublicNetworkAclEntry:
     Type: AWS::EC2::NetworkAclEntry
     Properties:
-      NetworkAclId:
-        Ref: PublicNetworkAcl
+      NetworkAclId: !Ref PublicNetworkAcl
       RuleNumber: 100
       Protocol: 6
       RuleAction: allow
       Egress: true
-      CidrBlock: '0.0.0.0/0'
+      CidrBlock: 0.0.0.0/0
       PortRange:
         From: 0
         To: 65535
+
   PublicSubnetNetworkAclAssociation0:
     Type: AWS::EC2::SubnetNetworkAclAssociation
     Properties:
-      SubnetId:
-        Ref: PublicSubnet0
-      NetworkAclId:
-        Ref: PublicNetworkAcl
+      SubnetId: !Ref PublicSubnet0
+      NetworkAclId: !Ref PublicNetworkAcl
+
   PublicSubnetNetworkAclAssociation1:
     Type: AWS::EC2::SubnetNetworkAclAssociation
     Properties:
-      SubnetId:
-        Ref: PublicSubnet1
-      NetworkAclId:
-        Ref: PublicNetworkAcl
+      SubnetId: !Ref PublicSubnet1
+      NetworkAclId: !Ref PublicNetworkAcl
+
   ElasticIP0:
     Type: AWS::EC2::EIP
     Properties:
       Domain: vpc
       Tags:
-      - Key: Name
-        Value:
-          Fn::Join:
-          - ''
-          - - Ref: TargetVPCName
-            - -nat-gateway-eip-0
+        - Key: Name
+          Value: !Join
+            - ""
+            - - !Ref TargetVPCName
+              - -nat-gateway-eip-0
+
   ElasticIP1:
     Type: AWS::EC2::EIP
     Properties:
       Domain: vpc
       Tags:
-      - Key: Name
-        Value:
-          Fn::Join:
-          - ''
-          - - Ref: TargetVPCName
-            - -nat-gateway-eip-1
+        - Key: Name
+          Value: !Join
+            - ""
+            - - !Ref TargetVPCName
+              - -nat-gateway-eip-1
+
   NATGateway0:
     Type: AWS::EC2::NatGateway
     Properties:
-      AllocationId:
-        Fn::GetAtt:
-        - ElasticIP0
-        - AllocationId
-      SubnetId:
-        Ref: PublicSubnet0
+      AllocationId: !GetAtt ElasticIP0.AllocationId
+      SubnetId: !Ref PublicSubnet0
       Tags:
-      - Key: Name
-        Value:
-          Fn::Join:
-          - ''
-          - - Ref: TargetVPCName
-            - -nat-gateway-0
+        - Key: Name
+          Value: !Join
+            - ""
+            - - !Ref TargetVPCName
+              - -nat-gateway-0
+
   NATGateway1:
     Type: AWS::EC2::NatGateway
     Properties:
-      AllocationId:
-        Fn::GetAtt:
-        - ElasticIP1
-        - AllocationId
-      SubnetId:
-        Ref: PublicSubnet1
+      AllocationId: !GetAtt ElasticIP1.AllocationId
+      SubnetId: !Ref PublicSubnet1
       Tags:
-      - Key: Name
-        Value:
-          Fn::Join:
-          - ''
-          - - Ref: TargetVPCName
-            - -nat-gateway-1
+        - Key: Name
+          Value: !Join
+            - ""
+            - - !Ref TargetVPCName
+              - -nat-gateway-1
+
   PrivateRouteTable0:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId:
-        Ref: TargetVPC
+      VpcId: !Ref TargetVPC
       Tags:
-      - Key: Name
-        Value:
-          Fn::Join:
-          - ''
-          - - Ref: TargetVPCName
-            - -private-route-table-0
+        - Key: Name
+          Value: !Join
+            - ""
+            - - !Ref TargetVPCName
+              - -private-route-table-0
+
   PrivateRouteTable1:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId:
-        Ref: TargetVPC
+      VpcId: !Ref TargetVPC
       Tags:
-      - Key: Name
-        Value:
-          Fn::Join:
-          - ''
-          - - Ref: TargetVPCName
-            - -private-route-table-1
+        - Key: Name
+          Value: !Join
+            - ""
+            - - !Ref TargetVPCName
+              - -private-route-table-1
+
   PrivateRouteToInternet0:
     Type: AWS::EC2::Route
     Properties:
-      RouteTableId:
-        Ref: PrivateRouteTable0
-      DestinationCidrBlock: '0.0.0.0/0'
-      NatGatewayId:
-        Ref: NATGateway0
+      RouteTableId: !Ref PrivateRouteTable0
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NATGateway0
+
   PrivateRouteToInternet1:
     Type: AWS::EC2::Route
     Properties:
-      RouteTableId:
-        Ref: PrivateRouteTable1
-      DestinationCidrBlock: '0.0.0.0/0'
-      NatGatewayId:
-        Ref: NATGateway1
+      RouteTableId: !Ref PrivateRouteTable1
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NATGateway1
+
   PrivateSubnetRouteTableAssociation00:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId:
-        Ref: PrivateSubnet00
-      RouteTableId:
-        Ref: PrivateRouteTable0
+      SubnetId: !Ref PrivateSubnet00
+      RouteTableId: !Ref PrivateRouteTable0
+
   PrivateSubnetRouteTableAssociation01:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId:
-        Ref: PrivateSubnet01
-      RouteTableId:
-        Ref: PrivateRouteTable0
+      SubnetId: !Ref PrivateSubnet01
+      RouteTableId: !Ref PrivateRouteTable0
+
   PrivateSubnetRouteTableAssociation10:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId:
-        Ref: PrivateSubnet10
-      RouteTableId:
-        Ref: PrivateRouteTable1
+      SubnetId: !Ref PrivateSubnet10
+      RouteTableId: !Ref PrivateRouteTable1
+
   PrivateSubnetRouteTableAssociation11:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId:
-        Ref: PrivateSubnet11
-      RouteTableId:
-        Ref: PrivateRouteTable1
+      SubnetId: !Ref PrivateSubnet11
+      RouteTableId: !Ref PrivateRouteTable1
+
   ALBSG:
     Type: AWS::EC2::SecurityGroup
     DependsOn:
-    - PublicSubnet0
-    - PublicSubnet1
+      - PublicSubnet0
+      - PublicSubnet1
     Properties:
       GroupDescription: ALB SG
-      VpcId:
-        Ref: TargetVPC
+      VpcId: !Ref TargetVPC
       Tags:
-      - Key: Name
-        Value: ALBSG
+        - Key: Name
+          Value: ALBSG
+
   ALBIngressHttp:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
@@ -562,9 +516,9 @@ Resources:
       IpProtocol: tcp
       ToPort: 80
       FromPort: 80
-      CidrIp: '0.0.0.0/0'
-      GroupId:
-        Ref: ALBSG
+      CidrIp: 0.0.0.0/0
+      GroupId: !Ref ALBSG
+
   ALBIngressHttpV6:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
@@ -572,9 +526,9 @@ Resources:
       IpProtocol: tcp
       ToPort: 80
       FromPort: 80
-      CidrIpv6: '::/0'
-      GroupId:
-        Ref: ALBSG
+      CidrIpv6: ::/0
+      GroupId: !Ref ALBSG
+
   ALBEgress:
     Type: AWS::EC2::SecurityGroupEgress
     Properties:
@@ -582,32 +536,31 @@ Resources:
       IpProtocol: tcp
       ToPort: 65535
       FromPort: 0
-      CidrIp: '0.0.0.0/0'
-      GroupId:
-        Ref: ALBSG
+      CidrIp: 0.0.0.0/0
+      GroupId: !Ref ALBSG
+
   ECSServiceSG:
     Type: AWS::EC2::SecurityGroup
     DependsOn:
-    - PrivateSubnet00
-    - PrivateSubnet10
+      - PrivateSubnet00
+      - PrivateSubnet10
     Properties:
       GroupDescription: DB Server SG
-      VpcId:
-        Ref: TargetVPC
+      VpcId: !Ref TargetVPC
       Tags:
-      - Key: Name
-        Value: ECSServiceSG
+        - Key: Name
+          Value: ECSServiceSG
+
   ECSIngressALB:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
       Description: Ingress HTTP from load balancer to ECS
-      GroupId:
-        Ref: ECSServiceSG
+      GroupId: !Ref ECSServiceSG
       IpProtocol: tcp
       ToPort: 65535
       FromPort: 0
-      SourceSecurityGroupId:
-        Ref: ALBSG
+      SourceSecurityGroupId: !Ref ALBSG
+
   ECSEgress:
     Type: AWS::EC2::SecurityGroupEgress
     Properties:
@@ -615,142 +568,141 @@ Resources:
       IpProtocol: tcp
       ToPort: 65535
       FromPort: 0
-      CidrIp: '0.0.0.0/0'
-      GroupId:
-        Ref: ECSServiceSG
+      CidrIp: 0.0.0.0/0
+      GroupId: !Ref ECSServiceSG
+
   DBServerSG:
     Type: AWS::EC2::SecurityGroup
     DependsOn:
-    - PrivateSubnet01
-    - PrivateSubnet11
+      - PrivateSubnet01
+      - PrivateSubnet11
     Properties:
       GroupDescription: DB Server SG
-      VpcId:
-        Ref: TargetVPC
+      VpcId: !Ref TargetVPC
       Tags:
-      - Key: Name
-        Value: DBServerSG
+        - Key: Name
+          Value: DBServerSG
+
   DBIngressECS:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
       Description: Ingress traffic from ECS to database
-      GroupId:
-        Ref: DBServerSG
+      GroupId: !Ref DBServerSG
       IpProtocol: tcp
       ToPort: 3306
       FromPort: 3306
-      SourceSecurityGroupId:
-        Ref: ECSServiceSG
+      SourceSecurityGroupId: !Ref ECSServiceSG
+
   DBEgress:
     Type: AWS::EC2::SecurityGroupEgress
     Properties:
       Description: Egress traffic from database to ECS
-      IpProtocol: '-1'
-      CidrIp: '0.0.0.0/0'
-      GroupId:
-        Ref: DBServerSG
+      IpProtocol: "-1"
+      CidrIp: 0.0.0.0/0
+      GroupId: !Ref DBServerSG
+
   DBSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
     Properties:
       Tags:
-        - Key: "Name"
+        - Key: Name
           Value: myrdsdbsubnetgroup
       DBSubnetGroupDescription: An appropriate description for your DB subnet group.
       DBSubnetGroupName: myrdsdbsubnetgroup
       SubnetIds:
-        - Ref: PrivateSubnet01
-        - Ref: PrivateSubnet11
+        - !Ref PrivateSubnet01
+        - !Ref PrivateSubnet11
+
   RDSCluster:
-    Type: "AWS::RDS::DBCluster"
     DeletionPolicy: Delete
+    Type: AWS::RDS::DBCluster
     Properties:
-      DBClusterParameterGroupName:
-        Ref: RDSDBClusterParameterGroup
-      DBSubnetGroupName:
-        Ref: DBSubnetGroup
+      DBClusterParameterGroupName: !Ref RDSDBClusterParameterGroup
+      DBSubnetGroupName: !Ref DBSubnetGroup
       Engine: aurora
-      DatabaseName:
-        Ref: DBName
-      MasterUsername: !Join ['', ['{{resolve:secretsmanager:', !Ref RDSSecret, ':SecretString:username}}' ]]
-      MasterUserPassword: !Join ['', ['{{resolve:secretsmanager:', !Ref RDSSecret, ':SecretString:password}}' ]]
+      DatabaseName: !Ref DBName
+      MasterUsername: !Join ["", ['{{resolve:secretsmanager:', !Ref RDSSecret, ':SecretString:username}}']]
+      MasterUserPassword: !Join ["", ['{{resolve:secretsmanager:', !Ref RDSSecret, ':SecretString:password}}']]
       VpcSecurityGroupIds:
-        - Ref: DBServerSG
+        - !Ref DBServerSG
       StorageEncrypted: true
+
   RDSSecret:
-    Type: "AWS::SecretsManager::Secret"
+    Type: AWS::SecretsManager::Secret
     Properties:
-      Name:
-        !Sub
-          - ${AWS::StackName}-${SecretName}
-          - { SecretName: RDSSecret }
-      Description: "This is a Secrets Manager secret for an RDS DB instance"
+      Name: !Sub
+        - ${AWS::StackName}-${SecretName}
+        - {SecretName: RDSSecret}
+      Description: This is a Secrets Manager secret for an RDS DB instance
       GenerateSecretString:
-        SecretStringTemplate: !Join ['', ['{"username": "', !Ref DBUsername, '"}' ]]
-        GenerateStringKey: "password"
+        SecretStringTemplate: !Join ["", ['{"username": "', !Ref DBUsername, '"}']]
+        GenerateStringKey: password
         PasswordLength: 16
         ExcludePunctuation: true
+
   SecretRDSInstanceAttachment:
-    Type: "AWS::SecretsManager::SecretTargetAttachment"
+    Type: AWS::SecretsManager::SecretTargetAttachment
     Properties:
       SecretId: !Ref RDSSecret
       TargetId: !Ref RDSCluster
       TargetType: AWS::RDS::DBCluster
+
   RDSDBClusterParameterGroup:
-    Type: "AWS::RDS::DBClusterParameterGroup"
+    Type: AWS::RDS::DBClusterParameterGroup
     Properties:
-      Description: "CloudFormation Sample Aurora Cluster Parameter Group"
+      Description: CloudFormation Sample Aurora Cluster Parameter Group
       Family: aurora5.6
       Parameters:
         character_set_database: utf32
+
   RDSDBInstance:
-    Type: "AWS::RDS::DBInstance"
+    Type: AWS::RDS::DBInstance
     Properties:
-      AvailabilityZone:
-        Fn::Sub:
+      AvailabilityZone: !Sub
         - ${AWS::Region}${AZ}
-        - AZ:
-            Fn::Select:
+        - AZ: !Select
             - 1
-            - Fn::FindInMap:
+            - !FindInMap
               - RegionMap
-              - Ref: AWS::Region
+              - !Ref AWS::Region
               - AZs
-      DBClusterIdentifier:
-        Ref: RDSCluster
+      DBClusterIdentifier: !Ref RDSCluster
       DBInstanceClass: db.t3.small
-      DBParameterGroupName:
-        Ref: RDSDBParameterGroup
-      DBSubnetGroupName:
-        Ref: DBSubnetGroup
+      DBParameterGroupName: !Ref RDSDBParameterGroup
+      DBSubnetGroupName: !Ref DBSubnetGroup
       Engine: aurora
       PubliclyAccessible: false
       MultiAZ: false
+
   RDSDBParameterGroup:
-    Type: 'AWS::RDS::DBParameterGroup'
+    Type: AWS::RDS::DBParameterGroup
     Properties:
       Description: CloudFormation Sample Aurora Parameter Group
       Family: aurora5.6
       Parameters:
         sql_mode: IGNORE_SPACE
-        max_allowed_packet: '4194304'
+        max_allowed_packet: "4194304"
         innodb_buffer_pool_size: '{DBInstanceClassMemory*3/4}'
+
   Cloud9Instance:
     Type: AWS::Cloud9::EnvironmentEC2
+    DependsOn: GatewayToInternet
     Properties:
-      Description: "Cloud9 IDE for the Deploy a .NET Application on Amazon ECS powered by Graviton2"
+      Description: Cloud9 IDE for the Deploy a .NET Application on Amazon ECS powered by Graviton2
       AutomaticStopTimeMinutes: 60
       InstanceType: t2.micro
       Name: !Sub ${AWS::StackName}-Cloud9Instance
       SubnetId: !Ref PublicSubnet1
-    DependsOn: GatewayToInternet
+
   ResizeC9VolumeCustom:
     Type: Custom::ResizeC9Volume
-    Version: '1.0'
+    DependsOn: Cloud9Instance
     Properties:
       ServiceToken: !GetAtt ResizeC9VolumeFunction.Arn
       Region: !Ref 'AWS::Region'
-      Version: '1.0'
-    DependsOn: Cloud9Instance
+      Version: "1.0"
+    Version: "1.0"
+
   ResizeC9VolumeFunction:
     Type: AWS::Lambda::Function
     Properties:
@@ -801,21 +753,22 @@ Resources:
               cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData, 'CustomResourcePhysicalID')
             except:
               cfnresponse.send(event, context, cfnresponse.FAILED, responseData, 'CustomResourcePhysicalID')
+
   LambdaVolumeResizeRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
-        Version: 2012-10-17
+        Version: "2012-10-17"
         Statement:
-          - Effect: 'Allow'
+          - Effect: Allow
             Principal:
               Service:
                 - lambda.amazonaws.com
-            Action: 'sts:AssumeRole'
+            Action: sts:AssumeRole
       Policies:
         - PolicyName: CWLogPolicy
           PolicyDocument:
-            Version: 2012-10-17
+            Version: "2012-10-17"
             Statement:
               - Effect: Allow
                 Action:
@@ -827,7 +780,7 @@ Resources:
                   - !Sub arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:log-stream:*
         - PolicyName: GetEc2Info
           PolicyDocument:
-            Version: 2012-10-17
+            Version: "2012-10-17"
             Statement:
               - Effect: Allow
                 Action:
@@ -835,17 +788,18 @@ Resources:
                 Resource: '*'
         - PolicyName: GetEc2ModifyVolume
           PolicyDocument:
-            Version: 2012-10-17
+            Version: "2012-10-17"
             Statement:
               - Effect: Allow
                 Action:
                   - ec2:ModifyVolume
-                Resource: 'arn:aws:ec2:*:*:volume/*'
+                Resource: arn:aws:ec2:*:*:volume/*
+
   ECSTaskExecutionRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
-        Version: 2012-10-17
+        Version: "2012-10-17"
         Statement:
           - Effect: Allow
             Principal:
@@ -855,11 +809,11 @@ Resources:
               - sts:AssumeRole
       Path: /
       ManagedPolicyArns:
-            - "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
       Policies:
         - PolicyName: get-secret-value
           PolicyDocument:
-            Version: 2012-10-17
+            Version: "2012-10-17"
             Statement:
               - Effect: Allow
                 Action:
@@ -870,9 +824,8 @@ Resources:
 Outputs:
   Cloud9IDE:
     Description: Cloud9 IDE Workspace
-    Value:
-      !Join ["",["https://",!Ref "AWS::Region",".console.aws.amazon.com/cloud9/ide/",!Ref Cloud9Instance,"?region=",!Ref "AWS::Region"]]
+    Value: !Join ["", ['https://', !Ref "AWS::Region", .console.aws.amazon.com/cloud9/ide/, !Ref Cloud9Instance, '?region=', !Ref "AWS::Region"]]
+
   RDSSecretARN:
     Description: RDS database secret ARN
-    Value:
-      Ref: RDSSecret
+    Value: !Ref RDSSecret

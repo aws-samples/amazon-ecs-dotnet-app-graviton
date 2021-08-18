@@ -38,7 +38,7 @@ namespace MvcMovie.Data
         {
              cancellationToken.ThrowIfCancellationRequested();
             if (user == null) throw new ArgumentNullException(nameof(user));
-    
+
             var appUser = await _context.Users.FirstOrDefaultAsync(m => m.Id == user.Id);
             if (appUser == null) throw new ArgumentException("User Not Found");
 
@@ -50,14 +50,14 @@ namespace MvcMovie.Data
 
         public void Dispose()
         {
-            
+
         }
 
         public async Task<AppUser> FindByIdAsync(string userId, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (userId == null) throw new ArgumentNullException(nameof(userId));
-            
+
             Guid idGuid;
             if(!Guid.TryParse(userId, out idGuid))
             {
@@ -71,7 +71,7 @@ namespace MvcMovie.Data
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (normalizedUserName == null) throw new ArgumentNullException(nameof(normalizedUserName));
-            
+
             return await _context.Users.FirstOrDefaultAsync(m => m.NormalizedUserName == normalizedUserName);
         }
 

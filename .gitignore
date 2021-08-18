@@ -1,3 +1,7 @@
+# Local development
+/config.mk
+/cfn/packaged.template
+
 _ReSharper.*
 _ReSharper.*/
 .build/
