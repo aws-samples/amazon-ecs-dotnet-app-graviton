@@ -21,7 +21,7 @@ namespace MvcMovie.Controllers
             _signInManager = signinMgr;
             _logger = logger;
         }
-        
+
         [AllowAnonymous]
         public IActionResult Login(string returnUrl)
         {
@@ -60,7 +60,7 @@ namespace MvcMovie.Controllers
             await _signInManager.SignOutAsync();
             return RedirectToAction("Index", "Home");
         }
-        
+
         public IActionResult ChangePassword()
         {
             var model = new ChangePassword();
@@ -73,7 +73,7 @@ namespace MvcMovie.Controllers
         {
             if (!ModelState.IsValid)
                 return View(changePassword);
-                
+
             var user = await _userManager.GetUserAsync(HttpContext.User);
             if (user == null)
                 return NotFound();
@@ -86,15 +86,15 @@ namespace MvcMovie.Controllers
                     ModelState.AddModelError(error.Code, error.Description);
                 return View(changePassword);
             }
-            
+
             if(user.EnforceChangePassword)
             {
                 user.EnforceChangePassword = false;
                 await _userManager.UpdateAsync(user);
             }
-            
+
             _logger.LogInformation($"User {user.UserName} password changed.");
-          
+
             return RedirectToAction("ChangePasswordConfirmation");
         }
 
@@ -102,20 +102,20 @@ namespace MvcMovie.Controllers
         {
             return View();
         }
-        
+
         public IActionResult SetPassword()
         {
             var model = new SetPassword();
             return View(model);
         }
-        
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SetPassword(SetPassword setPassword)
         {
             if (!ModelState.IsValid)
                 return View(setPassword);
-                
+
             var user = await _userManager.GetUserAsync(HttpContext.User);
             if (user == null)
                 return NotFound();
@@ -128,15 +128,15 @@ namespace MvcMovie.Controllers
                     ModelState.AddModelError(error.Code, error.Description);
                 return View(setPassword);
             }
-            
+
             if(user.EnforceChangePassword)
             {
                 user.EnforceChangePassword = false;
                 await _userManager.UpdateAsync(user);
             }
-            
+
             _logger.LogInformation($"User {user.UserName} password changed.");
-          
+
             return RedirectToAction("ChangePasswordConfirmation");
         }
     }

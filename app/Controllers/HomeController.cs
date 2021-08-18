@@ -63,7 +63,7 @@ namespace MvcMovie.Controllers
             {
                 movies = movies.Where(s => s.Year == winYear.Value);
             }
-            
+
             var movieGenreVM = new MovieGenreViewModel
             {
                 MovieGenre = movieGenre,

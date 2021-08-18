@@ -29,20 +29,20 @@ namespace MvcMovie
             services.AddDbContext<MvcMovieContext>(options =>
             {
                 var connectionString = Configuration.GetConnectionString("MvcMovieContext");
-                
+
                 var dbHost = Configuration["DBHOST"];
                 var dbUser = Configuration["DBUSER"];
                 var dbPass = Configuration["DBPASS"];
                 var dbName = Configuration["DBNAME"];
-                
+
                 if(!string.IsNullOrWhiteSpace(dbHost) &&
-                   !string.IsNullOrWhiteSpace(dbUser) && 
+                   !string.IsNullOrWhiteSpace(dbUser) &&
                    !string.IsNullOrWhiteSpace(dbPass) &&
                    !string.IsNullOrWhiteSpace(dbName))
                 {
                     var dbPort = Configuration["DBPORT"] ?? "3306";
                     var dbSslMode = Configuration["DBSSLMODE"];
-                    
+
                     connectionString = $"server={dbHost};port={dbPort};database={dbName};uid={dbUser};password={dbPass};";
                     if(!string.IsNullOrWhiteSpace(dbSslMode))
                         connectionString += $"SslMode={dbSslMode};";

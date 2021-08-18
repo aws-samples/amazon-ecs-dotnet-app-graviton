@@ -11,7 +11,7 @@ namespace MvcMovie.Data
     {
         private const string DefaultUsername = "admin";
         internal const string DefaultPassword = "Pass@word1";
-        
+
         public static void Initialize(IServiceProvider serviceProvider)
         {
             UpdateDatabase(serviceProvider);
@@ -32,7 +32,7 @@ namespace MvcMovie.Data
             using var context = new MvcMovieContext(
                 serviceProvider.GetRequiredService<
                     DbContextOptions<MvcMovieContext>>());
-            
+
             // Look for any movies.
             if (context.Users.Any())
             {
@@ -64,7 +64,7 @@ namespace MvcMovie.Data
             context.Movie.AddRange(GetMovies());
             context.SaveChanges();
         }
-        
+
         private static Movie[] GetMovies()
         {
             return new[]
@@ -148,7 +148,7 @@ namespace MvcMovie.Data
                         Director = "Tom Hooper",
                         Genre = "Drama History"
                     }
-            }; 
+            };
         }
     }
 }
