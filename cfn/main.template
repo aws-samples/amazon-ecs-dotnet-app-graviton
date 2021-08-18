@@ -3,6 +3,8 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: Containerize .Net on Graviton 2 Environment
 
 Metadata:
+  Version: 0.0.1
+
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
