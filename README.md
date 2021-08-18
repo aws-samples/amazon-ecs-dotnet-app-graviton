@@ -649,6 +649,9 @@ In the steps below, you'll run through the steps to clean up the resources you c
 4. Click on **Delete** button at the top of the page
 5. Confirm your action
 
+## Local Development
+See [Local Development](docs/LOCAL_DEVELOPMENT.md) guide to get a copy of the project up and running on your local machine for development and testing purposes.
+
 ## Security
 
 See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
