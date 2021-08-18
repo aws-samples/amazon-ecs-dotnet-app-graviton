@@ -639,6 +639,7 @@ Resources:
         GenerateStringKey: password
         PasswordLength: 16
         ExcludePunctuation: true
+      KmsKeyId: alias/aws/secretsmanager
 
   SecretRDSInstanceAttachment:
     Type: AWS::SecretsManager::SecretTargetAttachment
@@ -793,7 +794,7 @@ Resources:
               - Effect: Allow
                 Action:
                   - ec2:ModifyVolume
-                Resource: arn:aws:ec2:*:*:volume/*
+                Resource: !Sub arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:volume/*
 
   ECSTaskExecutionRole:
     Type: AWS::IAM::Role
