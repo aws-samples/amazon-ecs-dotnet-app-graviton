@@ -3,8 +3,6 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: Containerize .Net on Graviton 2 Environment
 
 Metadata:
-  Version: 0.0.1
-
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
@@ -14,14 +12,11 @@ Metadata:
       - Label:
           default: Amazon RDS Configuration
         Parameters:
-          - DBInstanceID
           - DBName
           - DBUsername
     ParameterLabels:
       TargetVPCName:
         default: Target VPC name
-      DBInstanceID:
-        default: Instance identifier
       DBName:
         default: Database name
       DBUsername:
@@ -32,15 +27,6 @@ Parameters:
     Description: The name of the Target VPC being created.
     Type: String
     Default: TargetVPC
-
-  DBInstanceID:
-    Description: Movie database instance
-    Type: String
-    Default: moviedbinstance
-    MinLength: "1"
-    MaxLength: "63"
-    AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
-    ConstraintDescription: Must begin with a letter and must not end with a hyphen or contain two consecutive hyphens.
 
   DBName:
     Description: Movie database
@@ -88,7 +74,13 @@ Mappings:
       AZs: [a, b]
     ap-southeast-1: # Asia Pacific (Singapore)
       AZs: [a, b]
+    ap-southeast-2: # Asia Pacific (Sydney)
+      AZs: [a, b]
     eu-west-1: # Europe (Ireland)
+      AZs: [a, b]
+    eu-west-2: # Europe (London)
+      AZs: [a, b]
+    eu-central-1: # Europe (Frankfurt)
       AZs: [a, b]
 
 Transform: AWS::Serverless-2016-10-31
@@ -646,7 +638,8 @@ Resources:
         SecretStringTemplate: !Join ["", ['{"username": "', !Ref DBUsername, '"}']]
         GenerateStringKey: password
         PasswordLength: 16
-        ExcludeCharacters: '"@/\'
+        ExcludePunctuation: true
+      KmsKeyId: alias/aws/secretsmanager
 
   SecretRDSInstanceAttachment:
     Type: AWS::SecretsManager::SecretTargetAttachment
@@ -678,7 +671,6 @@ Resources:
       DBInstanceClass: db.t3.small
       DBParameterGroupName: !Ref RDSDBParameterGroup
       DBSubnetGroupName: !Ref DBSubnetGroup
-      DBInstanceIdentifier: !Ref DBInstanceID
       Engine: aurora
       PubliclyAccessible: false
       MultiAZ: false
@@ -732,31 +724,32 @@ Resources:
           ec2 = boto3.client('ec2')
           def handler(event, context):
             responseData = {}
-            instance_name = '*' + os.environ['instance_name'] + '*'
-            print('Modifying Volume size for ' + instance_name)
-            try:
-              instance_data = ec2.describe_instances(Filters=[{'Name': 'tag:Name', 'Values': [instance_name]}])
-              print(instance_data)
-            except botocore.exceptions.ClientError as err:
-              print(err)
-              responseData['Data'] = 'FAILED'
-              cfnresponse.send(event, context, cfnresponse.FAILED, responseData, 'CustomResourcePhysicalID')
-              return
-            except:
-              responseData['Data'] = 'FAILED'
-              cfnresponse.send(event, context, cfnresponse.FAILED, responseData, 'CustomResourcePhysicalID')
-              return
-            try:
-              volume_id = instance_data['Reservations'][0]['Instances'][0]['BlockDeviceMappings'][0]['Ebs']['VolumeId']
-              responseData['Data'] = volume_id
-              volume_response = ec2.modify_volume(VolumeId=volume_id, Size=20)
-              print(volume_response)
-            except Exception as err:
-              print(err)
-              responseData['Data'] = 'Failed'
-              cfnresponse.send(event, context, cfnresponse.FAILED, responseData, 'CustomResourcePhysicalID')
-              return
-            print('Volume modified for instance ' + instance_name)
+            if event['RequestType'] != 'Delete':
+              instance_name = '*' + os.environ['instance_name'] + '*'
+              print('Modifying Volume size for ' + instance_name)
+              try:
+                instance_data = ec2.describe_instances(Filters=[{'Name': 'tag:Name', 'Values': [instance_name]}])
+                print(instance_data)
+              except botocore.exceptions.ClientError as err:
+                print(err)
+                responseData['Data'] = 'FAILED'
+                cfnresponse.send(event, context, cfnresponse.FAILED, responseData, 'CustomResourcePhysicalID')
+                return
+              except:
+                responseData['Data'] = 'FAILED'
+                cfnresponse.send(event, context, cfnresponse.FAILED, responseData, 'CustomResourcePhysicalID')
+                return
+              try:
+                volume_id = instance_data['Reservations'][0]['Instances'][0]['BlockDeviceMappings'][0]['Ebs']['VolumeId']
+                responseData['Data'] = volume_id
+                volume_response = ec2.modify_volume(VolumeId=volume_id, Size=20)
+                print(volume_response)
+              except Exception as err:
+                print(err)
+                responseData['Data'] = 'Failed'
+                cfnresponse.send(event, context, cfnresponse.FAILED, responseData, 'CustomResourcePhysicalID')
+                return
+              print('Volume modified for instance ' + instance_name)
             try:
               cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData, 'CustomResourcePhysicalID')
             except:
@@ -783,7 +776,9 @@ Resources:
                   - logs:CreateLogGroup
                   - logs:CreateLogStream
                   - logs:PutLogEvents
-                Resource: arn:aws:logs:*
+                Resource:
+                  - !Sub arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:*
+                  - !Sub arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:log-stream:*
         - PolicyName: GetEc2Info
           PolicyDocument:
             Version: "2012-10-17"
@@ -799,9 +794,9 @@ Resources:
               - Effect: Allow
                 Action:
                   - ec2:ModifyVolume
-                Resource: arn:aws:ec2:*:*:volume/*
+                Resource: !Sub arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:volume/*
 
-  CustomECSTaskExecutionRole:
+  ECSTaskExecutionRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -826,9 +821,6 @@ Resources:
                   - secretsmanager:GetSecretValue
                 Resource:
                   - !Ref RDSSecret
-      RoleName: !Sub
-        - ${AWS::StackName}-${RoleName}-${AWS::Region}
-        - {RoleName: ECSTaskExecutionRole}
 
 Outputs:
   Cloud9IDE:
