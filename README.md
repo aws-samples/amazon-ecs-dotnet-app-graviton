@@ -1,7 +1,7 @@
 [![Publish Version](https://github.com/aws-samples/amazon-ecs-dotnet-app-graviton/workflows/Publish%20Version/badge.svg)](https://github.com/aws-samples/amazon-ecs-dotnet-app-graviton/actions)
 [![Unit Tests](https://github.com/aws-samples/amazon-ecs-dotnet-app-graviton/workflows/Unit%20Tests/badge.svg)](https://github.com/aws-samples/amazon-ecs-dotnet-app-graviton/actions)
 
-<h1 style="text-align:center"> Deploy a .NET Web Application on Amazon ECS powered by Graviton2</h1>
+<h1 align="center"> Deploy a .NET Web Application on Amazon ECS powered by Graviton2</h1>
 
 This repository contains a sample application code, used in demonstrating the step-by-step guide to deploy a .NET Application on Amazon ECS powered by Graviton2 based EC2 Instances.
 
