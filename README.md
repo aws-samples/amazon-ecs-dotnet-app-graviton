@@ -110,6 +110,8 @@ The getting started guide instructions will illustrate how to clone this reposit
 |**US East (Ohio)** (us-east-2)|[![Deploy to AWS](docs/deploy-to-aws.png)](https://console.aws.amazon.com/cloudformation/home?region=us-east-2#/stacks/new?stackName=ContainerizeDotNetOnECSGraviton2&templateURL=https://s3.amazonaws.com/solution-builders-us-east-2/amazon-ecs-dotnet-app-graviton/latest/main.template)|
 |**US West (Oregon)** (us-west-2)|[![Deploy to AWS](docs/deploy-to-aws.png)](https://console.aws.amazon.com/cloudformation/home?region=us-west-2#/stacks/new?stackName=ContainerizeDotNetOnECSGraviton2&templateURL=https://s3.amazonaws.com/solution-builders-us-west-2/amazon-ecs-dotnet-app-graviton/latest/main.template)|
 |**EU (Ireland)** (eu-west-1)|[![Deploy to AWS](docs/deploy-to-aws.png)](https://console.aws.amazon.com/cloudformation/home?region=eu-west-1#/stacks/new?stackName=ContainerizeDotNetOnECSGraviton2&templateURL=https://s3.amazonaws.com/solution-builders-eu-west-1/amazon-ecs-dotnet-app-graviton/latest/main.template)|
+|**EU (Frankfurt)** (eu-central-1)|[![Deploy to AWS](docs/deploy-to-aws.png)](https://console.aws.amazon.com/cloudformation/home?region=eu-central-1#/stacks/new?stackName=ContainerizeDotNetOnECSGraviton2&templateURL=https://s3.amazonaws.com/solution-builders-eu-central-1/amazon-ecs-dotnet-app-graviton/latest/main.template)|
+|**AP (Sydney)** (ap-southeast-2)|[![Deploy to AWS](docs/deploy-to-aws.png)](https://console.aws.amazon.com/cloudformation/home?region=ap-southeast-2#/stacks/new?stackName=ContainerizeDotNetOnECSGraviton2&templateURL=https://s3.amazonaws.com/solution-builders-ap-southeast-2/amazon-ecs-dotnet-app-graviton/latest/main.template)|
 
 This should take you to AWS CloudFormation Service - Create Stack screen.
 
