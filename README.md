@@ -169,7 +169,7 @@ This module gives step-by-step instructions for the Build and Publish stage of S
 
 ### Setup Environment Variables
 
-1. Open the AWS Cloud9 new terminal window, following the instruction listed in Module2
+1. Open the AWS Cloud9 new terminal window, following the instruction listed in Module 2
 
 2. Configure the AWS CLI with your current region as default (you can retrieve the region you chose from instance metadata)
 
@@ -190,7 +190,7 @@ In subsequent steps you will be referring these values, so storing them in the e
 
 ### Create ECR Repository
 
-Create an Amazon ECR repository to store movie-app image, and note the Repo URI in the output. The output is also stored in an env variable called IMAGE_REPO_URI, using your utility function save_var. You can choose any name for your repository, in the example here, you chose movie-app-repo.
+Create an Amazon ECR repository to store movie-app image, set up environment variable for the Repo URI, and note the Repo URI in the output. You can choose any name for your repository, in the example here, you chose movie-app-repo.
 
 ```
 export IMAGE_REPO_URI=$( \
@@ -224,7 +224,7 @@ cd ~/environment/amazon-ecs-dotnet-app-graviton/app/
 touch Dockerfile
 ```
 
-3. Open Dockerfile either in Cloud9 IDE or via command-line text editor such as nano or vi, and the commands listed below. Each command has an inline documentation below to explain the purpose of the command.
+3. Open Dockerfile either in Cloud9 IDE or via command-line text editor such as nano or vi, copy the commands listed below and paste them into the file then save the file. Each command has an inline documentation below to explain the purpose of the command.
 
 ```
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
@@ -354,7 +354,7 @@ At this stage, you have an ECS Cluster created, with private subnets, however yo
 
 - **Task Definition Name**: Graviton2ECSTask
 - **Task Role**: None
-- **Task execution IAM role**: choose the role available in the dropdown - -ECSTaskExecutionRole. If you used the name suggested in Module 2 above, it should start with ContainerizeDotNetOnECSGraviton2-ECSTaskExecutionRole, this allows tasks to pull container images and publish container logs to Amazon CloudWatch on your behalf, as well as enables it to read secrets from AWS Secrets manager.
+- **Task execution IAM role**: choose the role available in the dropdown - <CloudFormation-Stack-Name>-ECSTaskExecutionRole. If you used the name suggested in Module 1, it should start with ContainerizeDotNetOnECSGraviton2-ECSTaskExecutionRole, this allows tasks to pull container images and publish container logs to Amazon CloudWatch on your behalf, as well as enables it to read secrets from AWS Secrets manager.
 - **Task memory (MiB)**: 512
 - **Task CPU (unit)**: 1024
 
@@ -372,7 +372,7 @@ It should look like below
 
 5. Next you have to add environment variables for the container to be able to access the Database instance deployed by the CloudFormation template in Module 1.
 
-Also refer the value of the key **RDSSecretARN**, you copied and pasted for later reference in the Module 2, you'll need it now.
+Also refer the value of the key **RDSSecretARN**, you copied and pasted for later reference in the Module 1, you'll need it now.
 
 In the **Environment Section** section under **Environment variables**, Add following environment variables.
 
@@ -451,9 +451,9 @@ Stay on the same screen, you'll set up Load Balancing for the Service.
 
 1. In the Networking section select **TargetVPC** under the VPC dropdown.
 
-2. Select Public subnets - **TargetVPC-public-a** and **TargetVPC-public-b**, this is only required for ALB Configuration.
+2. Select public subnets, **TargetVPC-public-a** and **TargetVPC-public-b**, under the Subnets dropdown, this is only required for ALB configuration. You should be able to find the subnet IDs for the these subnets in [Subnets](https://console.aws.amazon.com/vpc/?#subnets) list view by [searching for their names](https://console.aws.amazon.com/vpc/?#subnets:search=TargetVPC-public).
 
-3. Under Security group select - **Use an existing security group** and choose **ALBSG** from the dropdown.
+3. Under Security group select - **Use an existing security group** and choose <CloudFormation-Stack-Name>-ALBSG security group. If you used the name suggested in Module 1, it should start with **ContainerizeDotNetOnECSGraviton2-ALBSG**.
 
 ![Networking](docs/Step5-5.png)
 
