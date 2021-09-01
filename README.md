@@ -121,15 +121,15 @@ This should take you to AWS CloudFormation Service - Create Stack screen.
 
 4. On the Step 2 - Specify stack details screen, you can specify the stack name, network configuration, as well as Amazon RDS configuration. All required fields are already pre-filled with the default values You can leave them as default and press Next button.
 
-![Specify Stack Details](docs/Step1-3.jpg)
+![CloudFormation specify stack details](docs/Step1-3.jpg)
 
 5. On the Step 3 - Configure stack options screen - leave the defaults, and don’t make any changes, just press Next button.
 
 6. On the Step 4 - Review screen, scroll to the bottom of the page and check all checkboxes, as per the screenshot below, then press Create stack for the template to be deployed.
-   ![Confirm Stack](docs/Step1-5.jpg)
+   ![CloudFormation review stack](docs/Step1-5.jpg)
 
 7. When the template is in the CREATE_COMPLETE you can find information about created environment by going to AWS Console -> CloudFormation, selecting the created stack and going to the Outputs tab. You will see information like on the screenshot below.
-   ![Stack Status](docs/Step1-6.jpg)
+   ![CloudFormation stack output](docs/Step1-6.jpg)
    Copy the values and paste them into a notepad, or local text file for easy reference in the later instructions.
 
 ## Module 2: Setup Cloud9 Workspace
@@ -139,9 +139,9 @@ Now that you have configured an AWS Cloud9 environment into your account, you wi
 ### Open your Cloud9 IDE
 
 1. You can launch and navigate to your Cloud9 workspace by clicking on Cloud9 IDE URL shown in your CloudFormation stack outputs.
-   ![Stack Outputs](docs/Step2-1.jpg)
+   ![CloudFormation output Cloud9 IDE link](docs/Step2-1.jpg)
    Then you should have an IDE environment as shown below:
-   ![Cloud9 Screen](docs/Step2-2.jpg)
+   ![Cloud9 welcome page](docs/Step2-2.jpg)
 
 1. In Cloud9 open a new **Terminal** window using Top Navigation Window Menu, select New Terminal, it should open a new Terminal window. Keep your AWS Cloud9 IDE opened in a tab as you’ll be using it for future steps.
 
@@ -204,7 +204,7 @@ echo Repo URI: $IMAGE_REPO_URI
 
 The result should look something like this:
 
-![dotnet-ecs-graviton-module-3-1-create-repo-output](docs/Step3-1.png)
+![ECR repo creation output URI](docs/Step3-1.png)
 
 Keep this information on a separate notepad as you'll need this image repository URI when you specify container definition in your Amazon ECS Task Definition.
 
@@ -265,7 +265,7 @@ docker images movie-app
 ```
 
 The command line outputs should look something like below:
-![Docker Images](docs/Step3-3.png)
+![Docker images command output](docs/Step3-3.png)
 
 ### Publish Docker Image
 
@@ -285,7 +285,7 @@ aws ecr describe-images --repository-name movie-app-repo
 ```
 
 Output should look like this
-![ECR Docker Image](docs/Step3-4.png)
+![ECR describe images command output](docs/Step3-4.png)
 
 ## Module 4: Create Amazon ECS Cluster
 
@@ -297,7 +297,7 @@ From the AWS Management Console go to Amazon Elastic Container Service, either v
 
 The screenshots in this section may look different for those using old ECS Experience, ensure that where applicable, in left hand navigation pane New ECS Experience is enabled. If navigation pane is not visible, for some services, it may require clicking the hamburger button, to expand the navigation pane.
 
-![New Experience](docs/Step4-1.png)
+![ECS new experience](docs/Step4-1.png)
 
 ### Create ECS Cluster
 
@@ -306,7 +306,7 @@ In this step you'll create a new ECS Cluster.
 1. Click on Clusters menu in the navigation pane, and click on Create Cluster button.
 
 2. In **Step 1: Select cluster template**, choose **EC2 Linux + Networking.....** option and click **Next step** button
-   ![Create Cluster](docs/Step4-2.png)
+   ![ECS select cluster template](docs/Step4-2.png)
 
 3. In **Step 2 : Configure cluster**, use following values for the specified labels, and leave the rest default.
 
@@ -316,7 +316,7 @@ In this step you'll create a new ECS Cluster.
 
 **Number of instances**: 1
 
-![Configure Cluster](docs/Step4-3.jpg)
+![ECS configure cluster](docs/Step4-3.jpg)
 
 4. In the **Networking** section, enter following values for the specified labels:
 
@@ -326,7 +326,7 @@ In this step you'll create a new ECS Cluster.
 
 **Security Group**: select **ECSServiceSG** from the dropdown. You can click on the Security group selected to see the inbound and outbound rules.
 
-![ECS Networking](docs/Step4-4.png)
+![ECS networking configurations](docs/Step4-4.png)
 
 5. Leave rest of the settings as default, which means:
 
@@ -334,11 +334,11 @@ In this step you'll create a new ECS Cluster.
 
 - Ensure the **Enable Container Insights** Checkbox is ticked.
 
-![Container Insights](docs/Step4-5.png)
+![ECS container instance IAM role](docs/Step4-5.png)
 
 6. Now click **Create** button, on the next screen it should show you the progress of the cluster being created. Once successful, click **View Cluster** to see the details.
 
-![Cluster](docs/Step4-6.png)
+![ECS view cluster](docs/Step4-6.png)
 
 At this stage, you have an ECS Cluster created, with private subnets, however you don’t have any service/tasks running. For that you need to create a [Task Definition](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definitions.html).
 
@@ -348,7 +348,7 @@ At this stage, you have an ECS Cluster created, with private subnets, however yo
 
 2. In **Step 1: Select launch type compatibility**, Select EC2 for Launch type compatibility, hit **Next step**
 
-![New task Definition](docs/Step4-7.png)
+![ECS select launch type compatibility](docs/Step4-7.png)
 
 3. In Step 2: Configure task and container definitions, enter following values for the specified labels:
 
@@ -360,7 +360,7 @@ At this stage, you have an ECS Cluster created, with private subnets, however yo
 
 It should look like below
 
-![Confirm Task Definition](docs/Step4-8.png)
+![ECS configure task and container definitions](docs/Step4-8.png)
 
 4. Next step is to define the container to be used, click **Add Container** under **Container Definitions**, it should open a new window, then enter following values for the specified labels:
 
@@ -368,7 +368,7 @@ It should look like below
 - **Image**: paste the IMAGE_REPO_URI, that you copied earlier from Cloud9 console, make sure it ends with the tag: latest, unless you used a specific tag. It should be <AWS_ACCOUNT_ID>.dkr.ecr.<AWS_REGION>.amazonaws.com/movie-app-repo:latest
 - **Port mapping**: 0, 80 i.e. container to make port accessible for the underlying host port 80. Note: When you omit the Host Port (or set it to 0) while specifying a Container Port and your container automatically receives a port in the ephemeral port range for your container instance operating system and Docker version.
 
-![Container Definition](docs/Step4-9.jpg)
+![ECS add container](docs/Step4-9.jpg)
 
 5. Next you have to add environment variables for the container to be able to access the Database instance deployed by the CloudFormation template in Module 1.
 
@@ -390,20 +390,20 @@ Note: Where applicable values end with double colon symbols "::".
 - **Value/ValueFrom** dropdown value: value for hard coded values, and ValueFrom for the values retrieved from AWS Systems manager Parameter Store/AWS Secrets Manager.
 - **Value**: This guide demonstrates using AWS Secrets manager to store database credentials securely, so the value will be in the format as `arn:aws:secretsmanager:region:<aws_account_id>:secret:secret-name:json-key:version-stage:version-id` specified by the ECS documentation [here](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/specifying-sensitive-data-secrets.html).
 
-![Container Environment Variables](docs/Step4-10.png)
+![ECS add environment variables](docs/Step4-10.png)
 
 6. Under **STORAGE AND LOGGING** section select checkbox for **Log Configuration - Auto-configure CloudWatch Logs**, as below:
 
-![Container Logging](docs/Step4-11.jpg)
+![ECS enable Auto-configure CloudWatch Logs](docs/Step4-11.jpg)
 Leave rest of the settings as is and press Add button at the bottom of the screen.
 
 7. Back on the Task Definitions page, you should see the container definition, just created. Hit Create button to create the Task definition.
 
-![Task Definition Created](docs/Step4-12.png)
+![ECS create task definition](docs/Step4-12.png)
 
 8. Click on **Clusters** on the left side navigation pane, and then click on **Graviton2ECSCluster** from the list of Clusters.
 
-![Cluster launched](docs/Step4-13.png)
+![ECS review service](docs/Step4-13.png)
 
 Review the Service and Tasks, and you’ll see no records. This means that although your Task Definition is complete but no Tasks are running, so in the next section you'll create Amazon ECS Service, which will launch a [Load balanced Amazon ECS Service](https://docs.aws.amazon.com/AmazonECS/latest/userguide/service-load-balancing.html) and runs tasks using the task definition you created in this module.
 
@@ -415,7 +415,7 @@ So far in the guide you have prepared the foundational environment for your samp
 
 1. Select the Cluster - **Graviton2ECSCluster**
 
-![Cluster - Deploy Service](docs/Step5-1.png)
+![ECS select cluster](docs/Step5-1.png)
 
 2. Under the Services Tab, click Deploy button
 
@@ -425,7 +425,7 @@ So far in the guide you have prepared the foundational environment for your samp
 
 5. Select Launch Type as EC2 from the dropdown
 
-![Service Launch Type](docs/Step5-2.png)
+![ECS select launch type](docs/Step5-2.png)
 
 6. Under Deployment configuration section select Service, and under Task definition - Family select the task you created - **Graviton2ECSTask**, and **Revision** as **LATEST**
 
@@ -433,7 +433,7 @@ So far in the guide you have prepared the foundational environment for your samp
 
 8. Enter value for **Desired Tasks** to be **2**, as shown in the screenshot below
 
-![Desired Tasks](docs/Step5-3.png)
+![ECS select application type](docs/Step5-3.png)
 
 Stay on the same screen, you'll set up Load Balancing for the Service.
 
@@ -445,7 +445,7 @@ Stay on the same screen, you'll set up Load Balancing for the Service.
 
 3. Enter Target group name as **Graviton2ECS-ALB-TG** and protocol as HTTP
 
-![ALB Configuration](docs/Step5-4.png)
+![EC2 create a new Load Balancer](docs/Step5-4.png)
 
 ### Define Network Boundaries
 
@@ -455,17 +455,17 @@ Stay on the same screen, you'll set up Load Balancing for the Service.
 
 3. Under Security group select - **Use an existing security group** and choose <CloudFormation-Stack-Name>-ALBSG security group. If you used the name suggested in Module 1, it should start with **ContainerizeDotNetOnECSGraviton2-ALBSG**.
 
-![Networking](docs/Step5-5.png)
+![Load Balancer networking configurations](docs/Step5-5.png)
 
 4. Leave rest of the settings to default.
 
 5. Click **Deploy** button. Service deployment can take a few minutes. Once finished the Cluster will look like.
 
-![Cluster with Service](docs/Step5-6.png)
+![ECS deploy service](docs/Step5-6.png)
 
 6. Click on Service **Graviton2ECSService** from the list of Services to view the Tasks running, Health check status and notifications:
 
-![Service](docs/Step5-7.png)
+![ECS Service health check status](docs/Step5-7.png)
 
 You can note the Desired and Running count to verify that that ECS Service has successfully instantiated desired number of tasks. At this stage your Sample Application is live, under a single Task, behind an Application Load Balancer.
 
@@ -485,7 +485,7 @@ So the next step is to modify the Load balancing target group created by the ECS
 
 3. On the Group details tab, in the Attributes section, choose Edit.
 
-![Enable Sticky Session](docs/Step5-8.jpg)
+![Load Balancer edit attributes](docs/Step5-8.jpg)
 On the Edit attributes page,
 
 4. Select Stickiness.
@@ -496,7 +496,7 @@ On the Edit attributes page,
 
 7. Choose Save changes.
 
-![Enable Sticky Session 2](docs/Step5-9.jpg)
+![Load Balancer enable Sticky Session](docs/Step5-9.jpg)
 
 ### Test the deployment
 
@@ -506,11 +506,11 @@ Now the application is ready for testing, and you need to find the public facing
 
 2. Copy the value of DNS Name as shown below:
 
-![ALB URL Page](docs/Step5-10.png)
+![Load Balancer copy DNS name](docs/Step5-10.png)
 
 3. Open the copied URL in a new Browser window, It should open the Sample Application - Academy Award website.
 
-![Website](docs/Step5-11.png)
+![Web Application landing page](docs/Step5-11.png)
 
 Application is in read-only for anonymous users, to be able to modify the data, you can log in to the application using following admin credentials:
 
@@ -521,7 +521,7 @@ Password: Pass@word1
 
 When you logged in for the first time, application asks you to set a new password for your user, choose a new password and continue.
 
-![Mandatory Change Password](docs/Step5-12.png)
+![Web Application set new password](docs/Step5-12.png)
 
 This step completes the deployment of Sample .NET Web Application on Amazon ECS.
 
@@ -543,30 +543,30 @@ aws ecs update-cluster-settings --cluster Graviton2ECSCluster --settings name=co
 
 2. From the response of the command confirm that the settings the name “containerInsights” has the value “enabled”
 
-![Container Insights](docs/Step6-1.png)
+![ECS check ContainerInsights is enabled](docs/Step6-1.png)
 
 ### Visualising Container Insights in CloudWatch
 
 1. Navigate to the [Amazon CloudWatch Console](https://console.aws.amazon.com/cloudwatch) by typing “CloudWatch” and selecting the service name from the drop down
 2. The CloudWatch console is displayed as show below, ensure the **New menu experience** is selected in the top left corner of the screen to use the new CloudWatch console. On the menu on the left, click on **Container Insights** under the **Insights** section.
 
-![Container Insights - 1](docs/Step6-3.png)
+![CloudWatch overview](docs/Step6-3.png)
 
 3. The Container Insights dashboard is show below, ensure the **List View** is selected in the top right corner to show the list of the container resources. You can see the **Graviton2ECSCluster**, **Graviton2ECSService** and **Graviton2ECSTask**, which are resources created so far.
 
-![Container Insights - 2](docs/Step6-4.png)
+![CloudWatch Container Insights resources](docs/Step6-4.png)
 
 4. Container Insights provides metrics for each of these resources to help provide visibility on what is going on within the resources. Click on each of the resource to see the metrics as show below
 
    **Cluster metrics** - this provides a view of the CPU Utilisation, Memory Utilisation and Network Transferred and Received. It also provides a view of the count of Container Instance, Task and Service within the cluster.
 
-   ![Cluster Metrics](docs/Step6-5.png)
+   ![CloudWatch Container Insights cluster metrics](docs/Step6-5.png)
 
    **Service metrics** - provides a view of the aggregated metrics of the tasks running within the service and also the performance for each of the tasks.
 
    **Task metrics** - provides a view of the metrics for each task running in the cluster.
 
-   ![Cluster Metrics 2](docs/Step6-6.png)
+   ![CloudWatch Container Insights task metrics](docs/Step6-6.png)
 
 ### Analysing Application Logs via CloudWatch
 
@@ -574,15 +574,15 @@ While creating the Task Definition as shown in Module 4, you enabled Log Configu
 
 1. Navigate to the CloudWatch Console and click on Log Group under Logs in the left menu
 
-![CloudWatch Logs 1](docs/Step6-7.png)
+![CloudWatch Log groups](docs/Step6-7.png)
 
 2. The Log Group that was configured in Module 4 while creating the task definition is **/ecs/Graviton2ECSTask**. Select this log group to show the log streams from the containers in the ECS task. Sending logs to Cloudwatch logs enables you to view different logs from your containers in one convenient location, and it prevents your container logs from taking up disk space on your container instances.
 
-![CloudWatch Logs 2](docs/Step6-8.png)
+![CloudWatch Log groups ECS Task](docs/Step6-8.png)
 
 3. Select a log stream to display the application logs. In the top right corner of the screen you can specify filters based on date and time to retrieve the logs.
 
-![CloudWatch Logs 3](docs/Step6-9.png)
+![CloudWatch Log groups ECS Task Log events](docs/Step6-9.png)
 
 ## Module 7: Clean Up
 
