@@ -13,7 +13,7 @@ This guide utilizes [AWS Cloud9](https://aws.amazon.com/cloud9/) - a cloud-based
 
 This guide is split into following sections:
 
-- Create a Cloud9 environment with all the tools and pre-reqs using AWS CloudFormation template.
+- Create an [AWS Cloud9](https://aws.amazon.com/cloud9/) environment with all tools and prerequisites using [AWS CloudFormation](https://aws.amazon.com/cloudformation/).
 - Create a Docker image and push it to [Amazon ECR](https://aws.amazon.com/ecr/).
 - Create an [Amazon ECS Cluster](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/clusters.html).
 - Deploy the application to the Amazon ECS Cluster.
@@ -70,19 +70,19 @@ For the guide, please follow [here](https://aws.amazon.com/getting-started/hands
 
 The architecture is composed of following building blocks:
 
-- AWS Cloud9 environment facilitating creation of docker image, publication of image to Amazon ECR Repository
-- Amazon ECS Cluster with an [Application Load Balancer](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html) to balance the requests among the tasks launched by Amazon ECS Service
-- Database layer, powered by [Amazon Aurora MySQL](https://aws.amazon.com/rds/aurora/)
-- [Amazon Secrets Manager](https://aws.amazon.com/secrets-manager/) to securely store the database credentials, to be used by the sample application
+- AWS Cloud9 environment facilitating creation of docker image, publication of image to Amazon ECR Repository.
+- Amazon ECS Cluster with an [Application Load Balancer](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html) to balance the requests among the tasks launched by Amazon ECS Service.
+- Database layer, powered by [Amazon Aurora MySQL](https://aws.amazon.com/rds/aurora/).
+- [Amazon Secrets Manager](https://aws.amazon.com/secrets-manager/) to securely store the database credentials, to be used by the sample application.
 - [Amazon CloudWatch](https://aws.amazon.com/cloudwatch/) to enable logging and monitoring of the sample application deployed in Amazon ECS Cluster.
 
 ## Repository Structure
 
-- [`app`](app) directory contains the sample application code
-- [`cfn`](cfn) directory contains the CloudFormation template used to initialize the Cloud9 environment with sample application database
-- [`docs`](docs) directory contains the images and files associated with this documentation including "Local Development" guide
-- [`Code of Conduct`](CODE_OF_CONDUCT.md) file refers to Amazon Source Code - Code of Conduct guidelines
-- [`License`](LICENSE) file refers to license terms for the use of this repository and content
+- [`app`](app) directory contains the sample application code.
+- [`cfn`](cfn) directory contains the CloudFormation template used to initialize the Cloud9 environment with sample application database.
+- [`docs`](docs) directory contains the images and files associated with this documentation including "Local Development" guide.
+- [`Code of Conduct`](CODE_OF_CONDUCT.md) file refers to Amazon Source Code - Code of Conduct guidelines.
+- [`License`](LICENSE) file refers to license terms for the use of this repository and content.
 - [`README`](README.md) file refers to this page.
 
 ## Usage
