@@ -28,14 +28,14 @@ For the guide, please follow [here](https://aws.amazon.com/getting-started/hands
 - [Usage](#usage)
   - [Prerequisites](#prerequisites)
   - [Code Usage](#code-usage)
-- [Module 1: Setup your environment](#module-1-setup-your-environment)
-  - [Setup your environment](#setup-your-environment)
-- [Module 2: Setup Cloud9 Workspace](#module-2-setup-cloud9-workspace)
+- [Module 1: Set up your environment](#module-1-set-up-your-environment)
+  - [Set up your environment](#set-up-your-environment)
+- [Module 2: Set up Cloud9 Workspace](#module-2-set-up-cloud9-workspace)
   - [Open your Cloud9 IDE](#open-your-cloud9-ide)
   - [Expand Cloud9 Storage](#expand-cloud9-storage)
   - [Download Sample Application Code](#download-sample-application-code)
 - [Module 3: Create and Publish Docker Image](#module-3-create-and-publish-docker-image)
-  - [Setup Environment Variables](#setup-environment-variables)
+  - [Set up Environment Variables](#set-up-environment-variables)
   - [Create ECR Repository](#create-ecr-repository)
   - [Create Docker Image](#create-docker-image)
   - [Publish Docker Image](#publish-docker-image)
@@ -45,7 +45,7 @@ For the guide, please follow [here](https://aws.amazon.com/getting-started/hands
   - [Create ECS Task Definition](#create-ecs-task-definition)
 - [Module 5: Deploy the Application to Amazon ECS](#module-5-deploy-the-application-to-amazon-ecs)
   - [Create ECS Service](#create-ecs-service)
-  - [Setup Load Balancing](#setup-load-balancing)
+  - [Set up Load Balancing](#set-up-load-balancing)
   - [Define Network Boundaries](#define-network-boundaries)
   - [Enable Session Management for Sample Application](#enable-session-management-for-sample-application)
   - [Test the deployment](#test-the-deployment)
@@ -98,9 +98,9 @@ This is a sample application, only to be used for demonstration of deploying a .
 
 The getting started guide instructions will illustrate how to clone this repository into a Cloud9 environment, and create a Docker image, for deployment into ECS.
 
-## Module 1: Setup your environment
+## Module 1: Set up your environment
 
-### Setup your environment
+### Set up your environment
 
 1. Deploy the latest CloudFormation template by following the link below for your preferred AWS region:
 
@@ -132,7 +132,7 @@ This should take you to AWS CloudFormation Service - Create Stack screen.
    ![CloudFormation stack output](docs/Step1-6.jpg)
    Copy the values and paste them into a notepad, or local text file for easy reference in the later instructions.
 
-## Module 2: Setup Cloud9 Workspace
+## Module 2: Set up Cloud9 Workspace
 
 Now that you have configured an AWS Cloud9 environment into your account, you will set up your Cloud9 workspace and download the sample application’s source code into your environment.
 
@@ -167,7 +167,7 @@ In previous modules, you launched an AWS CloudFormation stack, which created a n
 You also cloned a sample .NET application from GitHub on the Cloud9 Bash Terminal, and built a .NET package.
 This module gives step-by-step instructions for the Build and Publish stage of Sample Application.
 
-### Setup Environment Variables
+### Set up Environment Variables
 
 1. Open the new AWS Cloud9 terminal window as per the instructions listed in Module 2.
 
@@ -212,13 +212,13 @@ Keep this information on a separate notepad as you'll need this image repository
 
 In this step you'll create a Dockerfile and then build a docker image for your sample application.
 
-1. Move to the source code directory
+1. Move to the source code directory.
 
 ```
 cd ~/environment/amazon-ecs-dotnet-app-graviton/app/
 ```
 
-2. Create Dockerfile in the root of the project
+2. Create Dockerfile in the root of the project.
 
 ```
 touch Dockerfile
@@ -258,7 +258,7 @@ docker build -t movie-app .
 docker tag movie-app $IMAGE_REPO_URI
 ```
 
-5.  Confirm the image is created successfully
+5.  Confirm the image is created successfully.
 
 ```
 docker images movie-app
@@ -324,7 +324,7 @@ In this step, you'll create a new ECS Cluster.
 
 **Subnets**: select 2 private subnets **TargetVPC-private-a-web** and **TargetVPC-private-b-web**, one after another
 
-**Security Group**: select **ECSServiceSG** from the dropdown. You can click on the Security group selected to see the inbound and outbound rules.
+**Security Group**: select **ECSServiceSG** from the dropdown. You can click on the Security group selected to see the inbound and outbound rules
 
 ![ECS networking configurations](docs/Step4-4.png)
 
@@ -346,7 +346,7 @@ At this stage, you have an ECS Cluster created, with private subnets, however yo
 
 1. Under the left hand side navigation pane on Amazon ECS page, you'll find an option for Task Definitions, click **Create new Task Definition**. This is the stage where you will specify the details of the container to be deployed, CPU and memory requirements, for simplicity, you will keep the changes to minimum. So leave the options default, unless specified.
 
-2. In **Step 1: Select launch type compatibility**, Select EC2 for Launch type compatibility, hit **Next step**
+2. In **Step 1: Select launch type compatibility**, Select EC2 for Launch type compatibility, hit **Next step**.
 
 ![ECS select launch type compatibility](docs/Step4-7.png)
 
@@ -354,7 +354,7 @@ At this stage, you have an ECS Cluster created, with private subnets, however yo
 
 - **Task Definition Name**: Graviton2ECSTask
 - **Task Role**: None
-- **Task execution IAM role**: choose the role available in the dropdown - <CloudFormation-Stack-Name>-ECSTaskExecutionRole. If you used the name suggested in Module 1, it should start with ContainerizeDotNetOnECSGraviton2-ECSTaskExecutionRole. This allows tasks to pull container images and publish container logs to Amazon CloudWatch on your behalf, as well as enables it to read secrets from AWS Secrets manager.
+- **Task execution IAM role**: choose the role available in the dropdown - <CloudFormation-Stack-Name>-ECSTaskExecutionRole. If you used the name suggested in Module 1, it should start with ContainerizeDotNetOnECSGraviton2-ECSTaskExecutionRole. This allows tasks to pull container images and publish container logs to Amazon CloudWatch on your behalf, as well as enables it to read secrets from AWS Secrets manager
 - **Task memory (MiB)**: 512
 - **Task CPU (unit)**: 1024
 
@@ -366,7 +366,7 @@ It should look like below
 
 - **Container name**: Graviton2Container
 - **Image**: paste the IMAGE_REPO_URI, that you copied earlier from Cloud9 console, make sure it ends with the tag: latest, unless you used a specific tag. It should be <AWS_ACCOUNT_ID>.dkr.ecr.<AWS_REGION>.amazonaws.com/movie-app-repo:latest
-- **Port mapping**: 0, 80 i.e. container to make port accessible for the underlying host port 80. Note: When you omit the Host Port (or set it to 0) while specifying a Container Port, your container automatically receives a port in the ephemeral port range for your container instance operating system and Docker version.
+- **Port mapping**: 0, 80 i.e. container to make port accessible for the underlying host port 80. Note: When you omit the Host Port (or set it to 0) while specifying a Container Port, your container automatically receives a port in the ephemeral port range for your container instance operating system and Docker version
 
 ![ECS add container](docs/Step4-9.jpg)
 
@@ -387,8 +387,8 @@ Note: Where applicable values end with double colon symbols "::".
 | DBSSLMODE | Value           | `none`                                                  |
 
 - **Key**: name of the env variable for your application, e.g. DBHOST
-- **Value/ValueFrom** dropdown value: value for hard coded values, and ValueFrom for the values retrieved from AWS Systems manager Parameter Store/AWS Secrets Manager.
-- **Value**: This guide demonstrates using AWS Secrets manager to store database credentials securely, so the value will be in the format as `arn:aws:secretsmanager:region:<aws_account_id>:secret:secret-name:json-key:version-stage:version-id` specified by the ECS documentation [here](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/specifying-sensitive-data-secrets.html).
+- **Value/ValueFrom** dropdown value: value for hard coded values, and ValueFrom for the values retrieved from AWS Systems manager Parameter Store/AWS Secrets Manager
+- **Value**: This guide demonstrates using AWS Secrets manager to store database credentials securely, so the value will be in the format as `arn:aws:secretsmanager:region:<aws_account_id>:secret:secret-name:json-key:version-stage:version-id` specified by the ECS documentation [here](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/specifying-sensitive-data-secrets.html)
 
 ![ECS add environment variables](docs/Step4-10.png)
 
@@ -405,7 +405,7 @@ Leave rest of the settings as is and press Add button at the bottom of the scree
 
 ![ECS review service](docs/Step4-13.png)
 
-Review the Service and Tasks, and you’ll see no records. This means that although your Task Definition is complete, no Tasks are running yet, So in the next section you’ll create Amazon ECS Service, which will launch a [Load balanced Amazon ECS Service](https://docs.aws.amazon.com/AmazonECS/latest/userguide/service-load-balancing.html) and runs tasks using the task definition you created in this module.
+Review the Service and Tasks, and you’ll see no records. This means that although your Task Definition is complete, no Tasks are running yet, so in the next section you’ll create Amazon ECS Service, which will launch a [Load balanced Amazon ECS Service](https://docs.aws.amazon.com/AmazonECS/latest/userguide/service-load-balancing.html) and runs tasks using the task definition you created in this module.
 
 ## Module 5: Deploy the Application to Amazon ECS
 
@@ -437,7 +437,7 @@ So far in the guide you have prepared the foundational environment for your samp
 
 Stay on the same screen, you'll set up Load Balancing for the Service.
 
-### Setup Load Balancing
+### Set up Load Balancing
 
 1. Expand Load balancing - optional section, select Create a new load balancer and enter name as **Graviton2ECSALB**.
 
@@ -557,7 +557,7 @@ aws ecs update-cluster-settings --cluster Graviton2ECSCluster --settings name=co
 
 ![CloudWatch Container Insights resources](docs/Step6-4.png)
 
-4. Container Insights provides metrics for each of these resources to help provide visibility on what is going on within the resources. Click on each of the resource to see the metrics as show below
+4. Container Insights provides metrics for each of these resources to help provide visibility on what is going on within the resources. Click on each of the resource to see the metrics as show below.
 
    **Cluster metrics** - this provides a view of the CPU Utilisation, Memory Utilisation and Network Transferred and Received. It also provides a view of the count of Container Instance, Task and Service within the cluster.
 
@@ -573,7 +573,7 @@ aws ecs update-cluster-settings --cluster Graviton2ECSCluster --settings name=co
 
 While creating the Task Definition as shown in Module 4, you enabled Log Configuration and specified a name for the log group. This will enable the application logs that were previously sent out to standard output to be sent to Amazon CloudWatch Logs. In this step, you will see how to review the application logs sent to CloudWatch.
 
-1. Navigate to the CloudWatch Console and click on Log Group under Logs in the left menu
+1. Navigate to the CloudWatch Console and click on Log Group under Logs in the left menu.
 
 ![CloudWatch Log groups](docs/Step6-7.png)
 
@@ -591,66 +591,66 @@ In the steps below, you'll run through the steps to clean up the resources you c
 
 ### Delete ECS Service
 
-1. In a new browser window, open the [Amazon ECS Console](https://console.aws.amazon.com/ecs/).
-2. In the navigation pane, click on **Clusters**.
-3. Click on the cluster **Graviton2ECSCluster**.
-4. Select the **Graviton2ECSService** service and click on **Delete**.
-5. Check the option **Force delete service**.
+1. In a new browser window, open the [Amazon ECS Console](https://console.aws.amazon.com/ecs/)
+2. In the navigation pane, click on **Clusters**
+3. Click on the cluster **Graviton2ECSCluster**
+4. Select the **Graviton2ECSService** service and click on **Delete**
+5. Check the option **Force delete service**
 6. Confirm your action.
 
 ### Delete Load Balancer
 
-1. In a new browser window, open the [Amazon ECS Console](https://console.aws.amazon.com/ecs/).
-2. In the left navigation pane, click on **Load balancers**.
-3. If not already selected, select **Graviton2ECSALB**, from the list of Load balancers.
-4. Click the dropdown **Actions** button at the top of the page.
-5. Select **Delete** under the dropdown menu.
+1. In a new browser window, open the [Amazon ECS Console](https://console.aws.amazon.com/ecs/)
+2. In the left navigation pane, click on **Load balancers**
+3. If not already selected, select **Graviton2ECSALB**, from the list of Load balancers
+4. Click the dropdown **Actions** button at the top of the page
+5. Select **Delete** under the dropdown menu
 6. Confirm your action.
 
 ### Delete Target Group
 
-1. In a new browser window, open the [Amazon ECS Console](https://console.aws.amazon.com/ecs/).
-2. In the left navigation pane, click on **Target groups**.
-3. If not already selected, select **Graviton2ECS-ALB-TG**, from the list of Target Groups.
-4. Click the dropdown **Actions** button at the top of the page.
-5. Select **Delete** under the dropdown menu.
+1. In a new browser window, open the [Amazon ECS Console](https://console.aws.amazon.com/ecs/)
+2. In the left navigation pane, click on **Target groups**
+3. If not already selected, select **Graviton2ECS-ALB-TG**, from the list of Target Groups
+4. Click the dropdown **Actions** button at the top of the page
+5. Select **Delete** under the dropdown menu
 6. Confirm your action.
 
 ### Delete Task Definition
 
-1. In a new browser window, open the [Amazon ECS Console](https://console.aws.amazon.com/ecs/).
-2. In the left navigation pane, click on **Task definitions**.
-3. Click on the Task Definition - **Graviton2ECSTask** to open.
-4. Select the revision.
-5. Click the white dropdown **Actions** button at the top of the page.
-6. Click on **Deregister**.
-7. Confirm your action.
+1. In a new browser window, open the [Amazon ECS Console](https://console.aws.amazon.com/ecs/)
+2. In the left navigation pane, click on **Task definitions**
+3. Click on the Task Definition - **Graviton2ECSTask** to open
+4. Select the revision
+5. Click the white dropdown **Actions** button at the top of the page
+6. Click on **Deregister**
+7. Confirm your action
 8. Repeat these steps for any other revisions present for the task definition.
 
 ### Delete ECS Cluster
 
-1. In a new browser window, open the [Amazon ECS Console](https://console.aws.amazon.com/ecs/).
-2. In the left navigation pane, click on **Clusters**.
-3. **Interim step** - In the navigation pane, **turn off New ECS Experience**, to use the old console. This is required in the interim until to delete cluster workflow is introduced in the new Amazon ECS console, as mentioned in the [Deleting a cluster documentation](https://docs.aws.amazon.com/AmazonECS/latest/userguide/delete_cluster.html).
-4. Click on the cluster **Graviton2ECSCluster** to open.
-5. Click on **Delete cluster** button at the top of the page.
-6. Confirm your action.
+1. In a new browser window, open the [Amazon ECS Console](https://console.aws.amazon.com/ecs/)
+2. In the left navigation pane, click on **Clusters**
+3. **Interim step** - In the navigation pane, **turn off New ECS Experience**, to use the old console. This is required in the interim until to delete cluster workflow is introduced in the new Amazon ECS console, as mentioned in the [deleting a cluster](https://docs.aws.amazon.com/AmazonECS/latest/userguide/delete_cluster.html) documentation
+4. Click on the cluster **Graviton2ECSCluster** to open
+5. Click on **Delete cluster** button at the top of the page
+6. Confirm your action
 7. This action will delete the ECS tasks and services, so it may take a few minutes.
 
 ### Delete ECR Repository
 
-1. In a new browser window, open the [Amazon ECS Console](https://console.aws.amazon.com/ecs/).
-2. In the left navigation pane, click on **Repositories**, under Amazon ECR.
-3. Select the repository name **movie-app-repo**.
-4. Click on **Delete** button at the top of the page.
+1. In a new browser window, open the [Amazon ECS Console](https://console.aws.amazon.com/ecs/)
+2. In the left navigation pane, click on **Repositories**, under Amazon ECR
+3. Select the repository name **movie-app-repo**
+4. Click on **Delete** button at the top of the page
 5. Confirm your action.
 
 ### Delete CloudFormation Stack
 
-1. In a new browser window, open the [AWS CloudFormation Console](https://console.aws.amazon.com/cloudformation/).
-2. In the left navigation pane, expand the sidebar and click on **Stacks**.
-3. Select the stack name **ContainerizeDotNetOnECSGraviton2**.
-4. Click on **Delete** button at the top of the page.
+1. In a new browser window, open the [AWS CloudFormation Console](https://console.aws.amazon.com/cloudformation/)
+2. In the left navigation pane, expand the sidebar and click on **Stacks**
+3. Select the stack name **ContainerizeDotNetOnECSGraviton2**
+4. Click on **Delete** button at the top of the page
 5. Confirm your action.
 
 ## Local Development
