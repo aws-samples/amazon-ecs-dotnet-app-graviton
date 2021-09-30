@@ -51,8 +51,8 @@ For the guide, please follow [here](https://aws.amazon.com/getting-started/hands
   - [Test the deployment](#test-the-deployment)
 - [Module 6: Monitoring and Logging](#module-6-monitoring-and-logging)
   - [Confirm Container Insights is Enabled](#confirm-container-insights-is-enabled)
-  - [Visualising Container Insights in CloudWatch](#visualising-container-insights-in-cloudwatch)
-  - [Analysing Application Logs via CloudWatch](#analysing-application-logs-via-cloudwatch)
+  - [Visualizing Container Insights in CloudWatch](#visualizing-container-insights-in-cloudwatch)
+  - [Analyzing Application Logs via CloudWatch](#analyzing-application-logs-via-cloudwatch)
 - [Module 7: Clean Up](#module-7-clean-up)
   - [Delete ECS Service](#delete-ecs-service)
   - [Delete Load Balancer](#delete-load-balancer)
@@ -94,7 +94,7 @@ You're not required to follow steps other than **Sign up for AWS** and **Create 
 
 ### Code Usage
 
-This is a sample application, only to be used for demonstration of deploying a .Net application on Graviton2 instances behind Amazon ECS.
+This is a sample application, only to be used for demonstration of deploying a .NET application on Graviton2 instances behind Amazon ECS.
 
 The getting started guide instructions will illustrate how to clone this repository into a Cloud9 environment, and create a Docker image, for deployment into ECS.
 
@@ -471,9 +471,9 @@ You can note the Desired and Running count to verify that ECS Service has succes
 
 ### Enable Session Management for Sample Application
 
-Sample .Net web application has Login Functionality, which enables logged-in user to edit the records, stored in Aurora DB.
+Sample .NET web application has Login Functionality, which enables logged-in user to edit the records, stored in Aurora DB.
 
-For the session management, this guide takes the simplest route by enabling sticky session, instead of adding complexity in the .Net sample app.
+For the session management, this guide takes the simplest route by enabling sticky session, instead of adding complexity in the .NET sample app.
 
 Sticky sessions are a mechanism to route requests from the same client to the same target. Elastic Load Balancers support sticky sessions. Stickiness is defined at a target group level.
 
@@ -529,7 +529,7 @@ This step completes the deployment of Sample .NET Web Application on Amazon ECS.
 
 This final module will focus on how you enable monitoring for your ECS environment using Amazon CloudWatch [Container Insights](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/ContainerInsights.html).
 
-This can be used to collect, aggregate, and summarise metrics and logs from your containerised application.
+This can be used to collect, aggregate, and summarize metrics and logs from your containerised application.
 
 Container Insights also provides diagnostic information, such as container restart failures, to help you isolate issues and resolve them quickly. You can also set CloudWatch alarms on metrics that Container Insights collects.
 
@@ -545,7 +545,7 @@ aws ecs update-cluster-settings --cluster Graviton2ECSCluster --settings name=co
 
 ![ECS check ContainerInsights is enabled](docs/Step6-1.png)
 
-### Visualising Container Insights in CloudWatch
+### Visualizing Container Insights in CloudWatch
 
 1. Navigate to the [Amazon CloudWatch Console](https://console.aws.amazon.com/cloudwatch) by typing “CloudWatch” in the search box, and selecting the service name as shown below:
 
@@ -559,7 +559,7 @@ aws ecs update-cluster-settings --cluster Graviton2ECSCluster --settings name=co
 
 4. Container Insights provides metrics for each of these resources to help provide visibility on what is going on within the resources. Click on each of the resource to see the metrics as show below.
 
-   **Cluster metrics** - this provides a view of the CPU Utilisation, Memory Utilisation and Network Transferred and Received. It also provides a view of the count of Container Instance, Task and Service within the cluster.
+   **Cluster metrics** - this provides a view of the CPU Utilization, Memory Utilization and Network Transferred and Received. It also provides a view of the count of Container Instance, Task and Service within the cluster.
 
    ![CloudWatch Container Insights cluster metrics](docs/Step6-5.png)
 
@@ -569,7 +569,7 @@ aws ecs update-cluster-settings --cluster Graviton2ECSCluster --settings name=co
 
    ![CloudWatch Container Insights task metrics](docs/Step6-6.png)
 
-### Analysing Application Logs via CloudWatch
+### Analyzing Application Logs via CloudWatch
 
 While creating the Task Definition as shown in Module 4, you enabled Log Configuration and specified a name for the log group. This will enable the application logs that were previously sent out to standard output to be sent to Amazon CloudWatch Logs. In this step, you will see how to review the application logs sent to CloudWatch.
 
